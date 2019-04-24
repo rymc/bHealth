@@ -36,30 +36,30 @@ class Transforms:
 
     @staticmethod
     def skewn(x):
-        skewness = scipy.stats.mstats.skew(x)              
+        skewness = scipy.stats.mstats.skew(x)
         skewness = skewness.data.flatten()[0]
         return skewness
 
     @staticmethod
     def spec_energy(x):
-        f = np.fft.fft(x)  
+        f = np.fft.fft(x)
         F = abs(f)
-        return sum(np.square(F))  
+        return sum(np.square(F))
 
     @staticmethod
     def spec_entropy(x):
-        f = np.fft.fft(x)  
+        f = np.fft.fft(x)
         F = abs(f)
         sumf = sum(F)
         if sumf == 0:
             sumf = 1
         nf = F/sumf
         min_nf = 1
-        if (min(nf) != max(nf)) and (min(nf) != 0):  
+        if (min(nf) != max(nf)) and (min(nf) != 0):
             min_nf = min(m for m in nf if m > 0)
 
         logf = np.log((nf+min_nf))
-        spectral_entropy = -1*sum(nf*logf)          
+        spectral_entropy = -1*sum(nf*logf)
         return spectral_entropy
 
     @staticmethod
