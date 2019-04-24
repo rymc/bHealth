@@ -42,16 +42,36 @@ while True:
         most_freq_label = np.bincount(windowed_raw_labels).argmax()
         y.append(most_freq_label)
 
+# Convert lists to Numpy arrays
+x = np.array(x)
+# Remove datetime from features
+x = x[:, 1:]
+y = np.array(y)
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import StratifiedKFold, cross_val_score, \
+        GridSearchCV, train_test_split
 
-clf = RandomForestClassifier(n_estimators=250,)
-cv_score = cross_val_score(clf, x, y, cv=5)
-print("5 CV accuracy "+str(np.mean(cv_score)))
+# Create train and test partitions
+skf = StratifiedKFold(n_splits=2, shuffle=False)
+train_index, test_index = skf.split(x, y).__next__()
+print(train_index)
+print(test_index)
+X_train, X_test = x[train_index], x[test_index]
+y_train, y_test = y[train_index], y[test_index]
 
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.6, random_state=0)
-clf = RandomForestClassifier(n_estimators=250,)
-clf.fit(X_train, y_train)
-tt_score = clf.score(X_test, y_test)
+# Create cross-validation partitions from training
+# This should select the best set of parameters
+cv = StratifiedKFold(n_splits=5, shuffle=False)
+clf = RandomForestClassifier()
+param_grid = {'n_estimators' : [200, 250, 300],
+              'min_samples_leaf': [5, 10, 20, 40]}
+grid = GridSearchCV(clf, param_grid=param_grid, cv=cv, refit=True)
+grid.fit(X_train, y_train)
+print('Best parameters are: {}'.format(grid.best_params_))
+print("5 CV accuracy "+str(np.mean(grid.cv_results_['mean_test_score'])))
+
+
+# The best model was fitted on the full training data, here it is tested only
+tt_score = grid.score(X_test, y_test)
 print("Train / test split accuracy "+str(tt_score))
