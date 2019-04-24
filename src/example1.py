@@ -2,7 +2,7 @@ from transforms import Transforms
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv('../data/realistic_sensor_displacement/subject2_ideal.log', sep='\t', header=None)
+df = pd.read_csv('../data/realistic_sensor_displacement/subject2_ideal.log.gz', sep='\t', header=None)
 
 acc= df.ix[:, [0, 68,69,70]]
 acc.columns=['ts', 'x','y','z']
