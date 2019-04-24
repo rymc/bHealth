@@ -24,8 +24,8 @@ current = winlength
 overlap = samples_per_sec * overlap_seconds
 
 transform = Transforms(window_length=winlength, window_overlap=overlap)
-print("Use number of zero crossings, spectral entropy as features..")
-feature_transforms = [transform.zero_crossings, transform.spec_entropy]
+print("Use number of mean crossings, spectral entropy as features..")
+feature_transforms = [transform.mean_crossings, transform.spec_entropy]
 
 while True:
     windowed_raw = transform.slide(xyz)

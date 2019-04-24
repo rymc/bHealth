@@ -10,18 +10,22 @@ class Transforms:
 
     @staticmethod
     def zero_crossings(x):
-        mean = np.mean(x)
         sign = [1,0]
         direction = 0
         count_zc = 0;
-        if x[0] >= mean:
+        if x[0] >= 0:
             direction = 1
 
         for i in range(len(x)):
-            if (x[i] >= mean and direction == 0) or (x[i] < mean and direction == 1):
+            if (x[i] >= 0 and direction == 0) or (x[i] < 0 and direction == 1):
                 direction = sign[direction]
                 count_zc += 1
         return count_zc
+
+    @staticmethod
+    def mean_crossings(x):
+        x = x - np.mean(x)
+        return Transforms.zero_crossings(x)
 
     @staticmethod
     def interq(x):
