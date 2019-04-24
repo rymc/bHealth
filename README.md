@@ -1,6 +1,12 @@
 # NewLib
 
-Let's create a library. 
+Let's create a library.
 
-For the data, gunzip the example data file, as its over the GitHub filesize limit uncompressed.
+# Installation and requirements
 
+```
+python3.6 -m venv venv
+source  venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
