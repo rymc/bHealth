@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.stats
 
 class Transforms:
 
@@ -31,7 +32,7 @@ class Transforms:
     def interq(x):
         p25 = np.percentile(x, 25)
         p75  = np.percentile(x, 75)
-        interquartile = p25 - p75
+        interquartile = p75 - p25
         return interquartile
 
     @staticmethod

@@ -1,9 +1,22 @@
+import os
+import pandas as pd
+import numpy as np
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import StratifiedKFold
+
+from .datawrapper.house import HouseVisit
+from .datawrapper.utils import get_all_paths, df_start_end_to_time
+
+
 def get_raw_ts_X_y():
-    import os
-    import numpy as np
-    import pandas as pd
-    from datawrapper.house import HouseVisit
-    from datawrapper.utils import get_all_paths, df_start_end_to_time
+
     datasets_path = '../data/houses'
     path_expression = r".*{0}(?P<hid>\w+){0}(?P<vid>\w+){0}sphere".format(
         os.sep)
@@ -43,7 +56,6 @@ def preprocess_X_y(ts, X, y):
 
 
 def split_train_test(X, y):
-    from sklearn.model_selection import StratifiedKFold
     # Create train and test partitions
     skf = StratifiedKFold(n_splits=2, shuffle=False)
     train_index, test_index = skf.split(X, y).__next__()
@@ -53,11 +65,6 @@ def split_train_test(X, y):
 
 
 def get_classifier_grid():
-    import numpy as np
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.svm import SVC
-    from sklearn.model_selection import StratifiedKFold, GridSearchCV
     # Create cross-validation partitions from training
     # This should select the best set of parameters
     cv = StratifiedKFold(n_splits=5, shuffle=False)
@@ -79,9 +86,6 @@ def get_classifier_grid():
                                           'C': [1, 10, 100, 1000]}, ]},
               }
 
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.impute import SimpleImputer
-    from sklearn.pipeline import Pipeline
     classifier_name = 'rf'
 
     steps = [('imputer', SimpleImputer(missing_values=np.nan,
@@ -100,7 +104,6 @@ def get_classifier_grid():
 
 
 def print_summary(clf_grid, X_test, y_test):
-    import numpy as np
     print('Best parameters are: {}'.format(clf_grid.best_params_))
     print("CV accuracy "+str(np.mean(clf_grid.cv_results_['mean_test_score'])))
 
