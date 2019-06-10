@@ -11,6 +11,7 @@ class Transforms:
 
     @staticmethod
     def zero_crossings(x):
+        """Return the number of zero crossings."""
         sign = [1,0]
         direction = 0
         count_zc = 0
@@ -25,32 +26,33 @@ class Transforms:
 
     @staticmethod
     def mean_crossings(x):
+        """Return the number of mean crossings."""
         x = x - np.mean(x)
         return Transforms.zero_crossings(x)
 
     @staticmethod
     def interq(x):
-        #p25 = np.percentile(x, 25)
-        #p75  = np.percentile(x, 75)
-        #interquartile = p75 - p25
-
+        """Return the interquartile range."""
         interquartile = scipy.stats.iqr(x)
         return interquartile
 
     @staticmethod
     def skewn(x):
+        """Return the skewness."""
         skewness = scipy.stats.mstats.skew(x)
         skewness = skewness.data.flatten()[0]
         return skewness
 
     @staticmethod
     def spec_energy(x):
+        """Return the spectral energy."""
         f = np.fft.fft(x)
         F = abs(f)
         return sum(np.square(F))
 
     @staticmethod
     def spec_entropy(x):
+        """Return the spectral entropy."""
         f = np.fft.fft(x)
         F = abs(f)
         sumf = sum(F)
@@ -67,17 +69,21 @@ class Transforms:
 
     @staticmethod
     def p25(x):
+        """Return the 25th-percentile."""
         return np.percentile(x, 25)
 
     @staticmethod
     def p75(x):
+        """Return the 75th-percentile."""
         return np.percentile(x, 75)
 
     @staticmethod
     def kurtosis(x):
+        """Return the kurtosis."""
         return scipy.stats.kurtosis(x, fisher=False, bias=True)
 
     def slide(self, x, update=True):
+        """Slide and return the window of data."""
         window = x[self.current_position-self.window_length:self.current_position]
         if len(window) > 0:
             if len(window.shape) > 1:

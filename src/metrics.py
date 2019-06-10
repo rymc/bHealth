@@ -18,7 +18,7 @@ class Metrics:
 
     @staticmethod
     def average_labels_per_window(labels, timestamps):
-        # assuming a finite set of ordinal labels
+        """Return the average label proportion per window."""
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
         number_of_instances = len(labels)
@@ -35,7 +35,7 @@ class Metrics:
 
     @staticmethod
     def duration_of_labels_per_window(labels, timestamps):
-        # assuming a finite set of ordinal labels
+        """Return the average duration of a label per window."""
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
         number_of_instances = len(labels)
@@ -55,7 +55,7 @@ class Metrics:
 
     @staticmethod
     def number_of_label_changes_per_window(labels, timestamps):
-        # assuming a finite set of ordinal labels
+        """Return a confusion matrix of the number of label changes in a window."""
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
         number_of_instances = len(labels)
@@ -77,6 +77,7 @@ class Metrics:
 
     @staticmethod
     def average_time_between_labels(labels, timestamps, normalise):
+        """Return the average time, in seconds, between labels in a window."""
         # normalise parameter attempts to remove sequential labels
         # assuming a finite set of ordinal labels
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
@@ -118,6 +119,7 @@ class Metrics:
         return average_per_label
 
     def establish_sampling_frequency(self, timestamps):
+        """Return the most likely sampling frequency from the timestamps in a time window."""
         sampling_frequency = []
         for idx, time in enumerate(timestamps):
             if idx >= 1:
@@ -129,6 +131,7 @@ class Metrics:
         return sampling_frequency
 
     def slide(self, index, update=True):
+        """Slide and return the window of data."""
         window = index[self.current_position - self.window_length:self.current_position]
         if len(window) > 0:
             if len(window.shape) > 1:
