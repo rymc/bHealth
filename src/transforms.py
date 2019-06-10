@@ -13,7 +13,7 @@ class Transforms:
     def zero_crossings(x):
         sign = [1,0]
         direction = 0
-        count_zc = 0;
+        count_zc = 0
         if x[0] >= 0:
             direction = 1
 
@@ -30,9 +30,11 @@ class Transforms:
 
     @staticmethod
     def interq(x):
-        p25 = np.percentile(x, 25)
-        p75  = np.percentile(x, 75)
-        interquartile = p75 - p25
+        #p25 = np.percentile(x, 25)
+        #p75  = np.percentile(x, 75)
+        #interquartile = p75 - p25
+
+        interquartile = scipy.stats.iqr(x)
         return interquartile
 
     @staticmethod
@@ -73,7 +75,7 @@ class Transforms:
 
     @staticmethod
     def kurtosis(x):
-        return scipy.stats.mstats.kurtosis(x)
+        return scipy.stats.kurtosis(x, fisher=False, bias=True)
 
     def slide(self, x, update=True):
         window = x[self.current_position-self.window_length:self.current_position]

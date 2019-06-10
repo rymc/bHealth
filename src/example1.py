@@ -1,5 +1,14 @@
+import numpy as np
+import pandas as pd
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
+
+from sklearn.model_selection import StratifiedKFold
+
+from transforms import Transforms
+
 def get_raw_ts_X_y():
-    import pandas as pd
     df = pd.read_csv('../data/realistic_sensor_displacement/subject2_ideal.log.gz', sep='\t', header=None)
 
     acc= df.ix[:, [0, 68,69,70]]
@@ -13,8 +22,6 @@ def get_raw_ts_X_y():
 
 
 def preprocess_X_y(ts, X, y):
-    import numpy as np
-    from transforms import Transforms
     new_X = []
     new_y = []
 
@@ -56,7 +63,6 @@ def preprocess_X_y(ts, X, y):
 
 
 def split_train_test(X, y):
-    from sklearn.model_selection import StratifiedKFold
     # Create train and test partitions
     skf = StratifiedKFold(n_splits=2, shuffle=False)
     train_index, test_index = skf.split(X, y).__next__()
@@ -66,8 +72,6 @@ def split_train_test(X, y):
 
 
 def get_classifier_grid():
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.model_selection import StratifiedKFold, GridSearchCV
     # Create cross-validation partitions from training
     # This should select the best set of parameters
     cv = StratifiedKFold(n_splits=5, shuffle=False)
