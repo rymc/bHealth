@@ -76,22 +76,46 @@ class Metrics:
         return label_change_array
 
     @staticmethod
-    def average_time_between_labels(labels, timestamps):
+    def average_time_between_labels(labels, timestamps, normalise):
+        # normalise parameter attempts to remove sequential labels
         # assuming a finite set of ordinal labels
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
+
+        sampling_frequency = []
+        for idx, time in enumerate(timestamps):
+            if idx >= 1:
+                sampling_frequency.append(time - previous_time)
+            previous_time = time
+
+        sampling_frequency = 1 / np.mean(sampling_frequency)
 
         number_of_instances = len(labels)
         number_of_labels = len(unique_lab)
         total_time_in_window = timestamps[-1] - timestamps[0]
 
-        label_change_array = np.zeros((number_of_labels, number_of_labels))
+        inter_label_times = []
+
+        average_per_label = np.zeros((number_of_labels, 1))
 
         for idx_outer in range(number_of_labels):
             lab_instance_outer = labels[idx_outer]
-            if labels[idx] == lab_instance_outer and labels[idx + 1] == lab_instance_inner:
-                label_change_array[int(idx_outer), int(idx_inner)] += 1
+            for idx in range(number_of_instances):
+                if labels[idx] == lab_instance_outer:
+                    inter_label_times.append(timestamps[idx])
 
-        return label_change_array
+            inter_label_times = np.diff(inter_label_times)
+
+            if normalise:
+                deletion_array = []
+                for idx, time in enumerate(inter_label_times):
+                    if np.isclose(time, sampling_frequency):
+                        deletion_array.append(idx)
+                inter_label_times = np.delete(inter_label_times, deletion_array)
+
+            average_per_label[idx_outer] = np.mean(inter_label_times)
+            inter_label_times = []
+
+        return average_per_label
 
     def establish_sampling_frequency(self, timestamps):
         sampling_frequency = []
