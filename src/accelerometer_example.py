@@ -1,6 +1,10 @@
 import numpy as np
+import numpy.ma as ma
+import numpy.matlib
 import pandas as pd
+from datetime import datetime
 
+from glob import glob
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
@@ -10,15 +14,61 @@ from sklearn.model_selection import StratifiedKFold
 from transforms import Transforms
 
 def get_raw_ts_X_y():
-    df = pd.read_csv('../data/realistic_sensor_displacement/subject2_ideal.log.gz', sep='\t', header=None)
 
-    acc= df.ix[:, [0, 68,69,70]]
-    acc.columns=['ts', 'x','y','z']
-    acc['ts'] = pd.to_datetime(acc['ts'], unit='s')
+    global xyz_
+    data_directory = '../data/acc_loc_data/experiments/*/'
 
-    ts = acc[['ts']].values
-    xyz = acc[['x','y','z']].values
-    labels = df[df.columns[-1]].values
+    folders = glob(data_directory)
+
+    ts = np.array([[0]])
+    xyz = np.array([[0, 0, 0]])
+    labels = np.array([[0]])
+
+    for idx, fold in enumerate(folders):
+
+        fold_data = [fold + 'accelerometer_filtered.csv']
+        fold_data = ''.join(fold_data)
+
+        data = pd.read_csv(fold_data, skiprows=1, usecols=[0, 4, 5, 6])
+
+        acc = data
+        acc.columns=['ts', 'x','y','z']
+        acc['ts'] = pd.to_datetime(acc['ts'])
+
+        ts_ = acc[['ts']].values
+
+        xyz_ = acc[['x','y','z']].values
+
+        fold_labels = [fold + 'activity_annotation_times.csv']
+        fold_labels = ''.join(fold_labels)
+
+        labs = pd.read_csv(fold_labels)
+
+        labels_ = np.zeros((ts_.size,), dtype=int)
+
+        for lab in labs.itertuples():
+            start_date = pd.to_datetime(lab.timestamp_start)
+            end_date = pd.to_datetime(lab.timestamp_end)
+            label_ = lab.activity_tag
+            mask = (ts_ > start_date) & (ts_ <= end_date)
+
+            for idx_mask, mk in enumerate(mask):
+                if mk == True:
+                    labels_[idx_mask] = int(label_)
+
+        for idx, t in enumerate(ts_):
+            times = t[0].timestamp()
+            local = datetime.fromtimestamp(times)
+            ts_[idx] = local.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+
+        labels = np.append(labels, labels_)
+        ts = np.concatenate((ts, ts_), axis=0)
+        xyz = np.concatenate((xyz, xyz_), axis=0)
+
+    labels = labels.astype(int)
+    #ts = np.delete([ts], 0)
+    #xyz = np.delete([xyz], 0)
+
     return ts, xyz, labels
 
 def preprocess_X_y(ts, X, y):
@@ -34,7 +84,7 @@ def preprocess_X_y(ts, X, y):
     overlap = samples_per_sec * overlap_seconds
 
     transform = Transforms(window_length=winlength, window_overlap=overlap)
-    print("Use number of mean crossings, spectral entropy as features..")
+    print("Use number of mean crossings, spectral entropy as features...")
     feature_transforms = [transform.mean_crossings, transform.spec_entropy]
 
     while True:

@@ -76,7 +76,7 @@ class Metrics:
         return label_change_array
 
     @staticmethod
-    def average_time_between_labels(labels, timestamps, normalise):
+    def average_time_between_labels(labels, timestamps, normalise=True):
         """Return the average time, in seconds, between labels in a window."""
         # normalise parameter attempts to remove sequential labels
         # assuming a finite set of ordinal labels
