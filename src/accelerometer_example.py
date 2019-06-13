@@ -13,7 +13,7 @@ from sklearn.model_selection import StratifiedKFold
 
 from transforms import Transforms
 
-def get_raw_ts_X_y():
+def data_loader():
 
     global xyz_
     data_directory = '../data/acc_loc_data/experiments/*/'
@@ -24,7 +24,11 @@ def get_raw_ts_X_y():
     xyz = np.array([[0, 0, 0]])
     labels = np.array([[0]])
 
+    print('Found', len(folders), 'experiment folders.')
+
     for idx, fold in enumerate(folders):
+
+        print('Running folder: ', idx + 1)
 
         fold_data = [fold + 'accelerometer_filtered.csv']
         fold_data = ''.join(fold_data)
@@ -32,12 +36,12 @@ def get_raw_ts_X_y():
         data = pd.read_csv(fold_data, skiprows=1, usecols=[0, 4, 5, 6])
 
         acc = data
-        acc.columns=['ts', 'x','y','z']
+        acc.columns = ['ts', 'x', 'y', 'z']
         acc['ts'] = pd.to_datetime(acc['ts'])
 
         ts_ = acc[['ts']].values
 
-        xyz_ = acc[['x','y','z']].values
+        xyz_ = acc[['x', 'y', 'z']].values
 
         fold_labels = [fold + 'activity_annotation_times.csv']
         fold_labels = ''.join(fold_labels)
@@ -66,9 +70,12 @@ def get_raw_ts_X_y():
         xyz = np.concatenate((xyz, xyz_), axis=0)
 
     labels = labels.astype(int)
-    #ts = np.delete([ts], 0)
-    #xyz = np.delete([xyz], 0)
 
+    return labels, ts, xyz
+
+def get_raw_ts_X_y():
+
+    labels, ts, xyz = data_loader()
     return ts, xyz, labels
 
 def preprocess_X_y(ts, X, y):
