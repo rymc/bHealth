@@ -5,6 +5,35 @@ from pandas import Timedelta
 
 
 class RandomTimeSeries(object):
+    """
+
+    Parameters
+    ----------
+
+    generator_list : (K, ) array_like
+        List of K generator functions. Each generator function should return an
+        ndarray with shape (N, D) where N is an arbitrary number of samples and
+        D is always the same number of feature dimentions.
+
+    labels : (K, ) array_like, optional
+        Label corresponding to each of the K generators. The label is not used
+        by the object but can be useful as a reference. If None a list of
+        integers frm 0 to K is generated.
+
+    priors : (K, ) array_like, optional
+        Prior probability for each of the K generators that is used to sample
+        from a multinomial distribution.
+
+    samplesize : str
+        String of the form 'S', '3S', '5Min', '3H', '1D', '2M', denoting the
+        amount of time for each sample.
+
+    Attributes
+    ----------
+
+    labels : (K, ) array_like
+        Label corresponding to each generator
+    """
     def __init__(self, generator_list, labels=None, priors=None,
                  samplesize='1S'):
         self.generator_list = generator_list
@@ -16,10 +45,32 @@ class RandomTimeSeries(object):
         assert(len(generator_list) == len(labels))
         assert(len(labels) == len(priors))
         self.labels = labels
-        self.priors = priors
+        self.priors = numpy.array(priors)/sum(priors)
         self.samplesize = Timedelta(samplesize)
 
     def generate(self, start_time, end_time):
+        """
+        Returns a tuple with datetimes, features and labels.
+
+        Parameters
+        ----------
+        start_time : datetime
+            Datetime of the first generated sample
+
+        end_time : datetime
+            Datetime of the last generated sample
+
+        Returns
+        -------
+        ts : (N, ) ndarray of datetime, optional
+            One-dimensional array with the datetime of every label.
+
+        X : (N, D) ndarray
+            Matrix with N samples and D feature values.
+
+        y_array : (N, ) ndarray of integers
+            One-dimensional array with all the labels in numerical discrete format.
+        """
         start_time = dateutil.parser.parse(start_time)
         end_time = dateutil.parser.parse(end_time)
         total_samples = int((end_time - start_time)/self.samplesize)
