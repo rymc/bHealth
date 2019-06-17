@@ -54,11 +54,13 @@ class RandomTimeSeries(object):
 
         Parameters
         ----------
-        start_time : datetime
-            Datetime of the first generated sample
+        start_time : datetime or str
+            Datetime of the first generated sample, if string it is parsed with
+            dateutil.parser.parse.
 
-        end_time : datetime
-            Datetime of the last generated sample
+        end_time : datetime or str
+            Datetime of the last generated sample, if string it is parsed with
+            dateutil.parser.parse.
 
         Returns
         -------
@@ -71,8 +73,10 @@ class RandomTimeSeries(object):
         y_array : (N, ) ndarray of integers
             One-dimensional array with all the labels in numerical discrete format.
         """
-        start_time = dateutil.parser.parse(start_time)
-        end_time = dateutil.parser.parse(end_time)
+        if isinstance(start_time, str):
+            start_time = dateutil.parser.parse(start_time, dayfirst=True)
+        if isinstance(end_time, str):
+            end_time = dateutil.parser.parse(end_time, dayfirst=True)
         total_samples = int((end_time - start_time)/self.samplesize)
         current_samples = 0
         X = []
@@ -102,7 +106,7 @@ if __name__ == '__main__':
     rts = RandomTimeSeries(generator_list, labels=labels,
                            priors=[3/6, 1/6, 1/6, 1/6], samplesize='1Min')
 
-    ts, X, y = rts.generate('11/06/2019', '11/07/2019')
+    ts, X, y = rts.generate('06/12/2019', '07/12/2019')
     print(len(ts), 'samples have been generated')
     print(ts)
     print(y)
@@ -122,7 +126,7 @@ if __name__ == '__main__':
                                                   priors=[2/5, 2/5, 1/5],
                            samplesize='1Min')
 
-    ts, X, y = rts.generate('07:00 11-06-2019', '23:30 11-06-2019')
+    ts, X, y = rts.generate('07:00 06-11-2019', '23:30 06-11-2019')
     print(len(ts), 'samples have been generated')
     print(ts)
     print(y)
@@ -137,7 +141,7 @@ if __name__ == '__main__':
     rts = RandomTimeSeries(generator_list, labels=labels,
                            priors=[3/6, 1/6, 1/6, 1/6], samplesize='10Min')
 
-    ts, X, y = rts.generate('11/06/2019', '11/11/2019')
+    ts, X, y = rts.generate('06/11/2019', '11/11/2019')
     print(len(ts), 'samples have been generated')
     print(ts)
     print(y)
