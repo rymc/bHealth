@@ -192,19 +192,83 @@ def labels_figure(y_array, ts=None, labels=None, fig=None, ax=None,
 
 def polar_labels_figure(labels, label_names, xticklabels, empty_rows=0,
                         leading_labels=0, spiral=False,
-                        title=None, m=None):
-    '''
-        labels: integer array (n_rows, n_columns)
-        label_names: list of strings (eg. bedroom, ..., kitchen)
-        xticklabels: list of strings (eg. Mon,...,Sun)
-        leading_labels: Number of empty labels to leave at the beginning
-        spiral: boolean
-    '''
+                        title=None, m=None, fig=None, ax=None, figsize=None):
+    """
+    Returns polar plot with categorical bins from a matrix.
+
+    Parameters
+    ----------
+    labels : (R, C) ndarray of integers
+        Matrix of integers from [-1, K] denoting different labels and with the
+        special value of -1 denoting no label. The value is used as an index
+        for the list label_names.
+
+    label_names : (K, ) array_like of strings
+        List of strings representing each of the K labels. (eg. bedroom,
+        living room, ..., kitchen)
+
+    xticklabels : (D, ) array_like of strings
+        List of strings to print around the circle with equal spacing in
+        between and with the first element corresponding to the 90 degree and
+        the following in a clockwise order. (eg. Monday, Tuesday, ..., Sunday)
+
+    empty_rows : integer, optional (default 0)
+        Number of empty rows to insert at the beginning of the labels matrix.
+        This can be used to reduce or increase the empty space at the centre of
+        the circle.
+
+    leading_labels : integer, optional (default 0)
+        Number of empty labels to insert at the beginning of the first row in
+        order to start the first label in a different position than 90 degrees.
+
+    spiral : boolean, optional (default False)
+        If True, the labels are arranged in a spiral in which a row starts at
+        the same level than the end bin of the previous row.
+        If False, each row is in its own concentric circle, the previous one
+        always smaller than the following one.
+
+    title : string, optional (default None)
+        Title for the figure.
+
+    m : matplotlib colormap, optional (default None)
+        Colormap that is used for each of the K labels.
+        If None:
+            If K < 11:
+                m = cm.get_cmap('tab10')
+            Else if K < 21:
+                m = cm.get_cmap('tab20')
+            Else:
+                m = cm.gist_rainbow (Normalised with maximum colour value at K)
+
+    fig : matplotlib.figure.Figure, optional
+        Matplotlib figure where to create the axes for the plot, if None a new
+        figure is created.
+
+    ax : matplotlib.axes.Axes, optional (default None)
+        Maptlotlib Axes where to create the plot in polar form. If None a new
+        axes is created.
+
+    figsize : (float, float), optional (default None)
+        width, height in inches. If not provided default from matplotlib.
+
+    Returns
+    -------
+    fig : matplotlib figure
+
+    ax  : matplotlib axis
+
+    """
+    if ax is None:
+        if fig is None:
+            fig = plt.figure(figsize)
+        ax = fig.add_axes([0, 0, 1.0, 0.9], polar=True)
+
+    if labels is None:
+        labels = numpy.arrange(numpy.unique(y_array))
+
     n_rows = labels.shape[0] + empty_rows
     n_columns = labels.shape[1]
     labels = labels.flatten()
-    fig = plt.figure()
-    ax = fig.add_axes([0, 0, 1.0, 0.9], polar=True)
     ax.set_title(title)
 
     if m is None:
