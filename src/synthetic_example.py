@@ -31,28 +31,26 @@ def get_raw_ts_X_y():
                         ) + np.random.randn(n_samples, size)
 
     n_features = 7
-    features = ['rssi bathroom', 'rssi bedroom 1', 'rssi stairs', 'rssi hall',
-                'rssi kitchen', 'rssi living room']
-    generator_list = [
-        lambda: np.random.randn(np.random.randint(2, 15), n_features)
-                + [3, 1, 0, 1, 0, 0, 0],
-        lambda: sin_gaussian_rand(np.random.randint(5*60, 8*60), n_features)
-                + [0, 4, 1, 2, 1, 1, 0],
-        lambda: np.random.randn(np.random.randint(30, 90), n_features)
-                + [0, 1, 0, 5, 0, 0, 1],
-        lambda: np.random.randn(np.random.randint(2, 10), n_features)
-                + [1, 1, 0, 1, 4, 0, 1],
-        lambda: sin_gaussian_rand(np.random.randint(15, 90), n_features)
-                + [1, 1, 0, 1, 2, 4, 3],
-        lambda: np.random.randn(np.random.randint(30, 120), n_features)
-                + [0, 1, 1, 0, 2, 3, 9],
-                ]
+    features = ['Acceleration X', 'Acceleration Y', 'Acceleration Z']
+    # First example
+    generator_list = [lambda: np.random.randn(np.random.randint(1, 100), 3)/2
+                                + [0, -1, 0],
+                      lambda: np.random.randn(np.random.randint(10, 300), 3)/2
+                                + [0, 0, -1],
+                      lambda: sin_gaussian_rand(np.random.randint(15, 300), 3)
+                                + [0, -1, 0],
+                      lambda: sin_gaussian_rand(np.random.randint(30, 90), 3)*2
+                                + [0, 0, -1],
+                      lambda: np.random.randn(np.random.randint(5*60, 10*60), 3)/16
+                                + [-0.5, 0.5, 0]
+                     ]
 
-    labels = ['bathroom', 'bedroom 1', 'bedroom 2', 'hall', 'kitchen', 'living room']
+    labels = ['stand', 'sit', 'walk', 'run', 'sleep']
     rts = RandomTimeSeries(generator_list, labels=labels,
-                           priors=[5, 2, 4, 9, 3, 3], samplesize='1Min')
+                           priors=[3, 4, 2, 1, 1], samplesize='1Min')
 
-    ts, X, y = rts.generate('01-03-2019', '09-03-2019')
+    ts, X, y = rts.generate('06/02/2019', '27/02/2019')
+
     return ts, X, y, labels, features
 
 
@@ -125,7 +123,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
             return -1
         return np.argmax(np.bincount(x))
 
-    resample = '1H'
+    resample = '15Min'
     df_labels = pd.DataFrame(y_pred, columns=['label'], index=ts).resample(resample).agg(most_common)
 
     # Add NaN at the beginning for days before installation
@@ -142,17 +140,11 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     # Number of columns in one week
     n_columns = int(pd.Timedelta('1D') /
                      pd.Timedelta(resample))
-    weekly = False
-    if weekly:
-        n_columns *= 7
-        xticklabels = ('Mon 00:00', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
-                       'Sun')
-        filename = 'labels_weekly.png'
-    else:
-        xticklabels = ('24', '1', '2', '3', '4', '5', '6', '7',
-                       '8', '9', '10', '11', '12', '13', '14', '15',
-                       '16', '17', '18', '19', '20', '21', '22', '23')
-        filename = 'labels_daily.png'
+
+    xticklabels = ('24', '1', '2', '3', '4', '5', '6', '7',
+                   '8', '9', '10', '11', '12', '13', '14', '15',
+                   '16', '17', '18', '19', '20', '21', '22', '23')
+    filename = 'labels_daily.png'
 
     # Add carrying -1 (denoting NaNs)
     y_labels = df_labels['label'].values
@@ -164,8 +156,8 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     y_labels = y_labels.reshape((-1, n_columns)).astype(int)
 
     fig, ax = polar_labels_figure(y_labels, labels, xticklabels,
-                                  empty_rows=0, leading_labels=0, spiral=True,
-                                  title=None, m=None)
+                                  empty_rows=4, leading_labels=0, spiral=True,
+                                  title="{} per box".format(resample), m=None)
     fig.savefig(filename, dpi=300)
 
 

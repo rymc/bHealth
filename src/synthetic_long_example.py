@@ -130,17 +130,11 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     # Number of columns in one week
     n_columns = int(pd.Timedelta('1D') /
                      pd.Timedelta(resample))
-    weekly = True
-    if weekly:
-        n_columns *= 7
-        xticklabels = ('Mon 00:00', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
-                       'Sun')
-        filename = 'labels_weekly.png'
-    else:
-        xticklabels = ('24', '1', '2', '3', '4', '5', '6', '7',
-                       '8', '9', '10', '11', '12', '13', '14', '15',
-                       '16', '17', '18', '19', '20', '21', '22', '23')
-        filename = 'labels_daily.png'
+
+    n_columns *= 7
+    xticklabels = ('Mon 00:00', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
+                   'Sun')
+    filename = 'labels_weekly.png'
 
     # Add carrying -1 (denoting NaNs)
     y_labels = df_labels['label'].values
@@ -153,7 +147,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
 
     fig, ax = polar_labels_figure(y_labels, labels, xticklabels,
                                   empty_rows=4, leading_labels=0, spiral=True,
-                                  title=None, m=None)
+                                  title="{} per box".format(resample), m=None)
     fig.savefig(filename, dpi=300)
 
 
