@@ -188,3 +188,65 @@ def labels_figure(y_array, ts=None, labels=None, fig=None, ax=None,
     ax.grid(b=True)
     ax.set_axisbelow(True)
     return fig, ax
+
+
+def polar_labels_figure(labels, label_names, xticklabels, empty_rows=0,
+                        leading_labels=0, spiral=False,
+                        title=None, m=None):
+    '''
+        labels: integer array (n_rows, n_columns)
+        label_names: list of strings (eg. bedroom, ..., kitchen)
+        xticklabels: list of strings (eg. Mon,...,Sun)
+        leading_labels: Number of empty labels to leave at the beginning
+        spiral: boolean
+    '''
+    n_rows = labels.shape[0] + empty_rows
+    n_columns = labels.shape[1]
+    labels = labels.flatten()
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1.0, 0.9], polar=True)
+    ax.set_title(title)
+
+    if m is None:
+        if len(label_names) < 11:
+            m = cm.get_cmap('tab10')
+        elif len(label_names) < 21:
+            m = cm.get_cmap('tab20')
+        else:
+            norm = mpl.colors.Normalize(vmin=0, vmax=len(label_names))
+            cmap = cm.gist_rainbow
+            colors = cm.ScalarMappable(norm=norm, cmap=cmap)
+            m = colors.to_rgba
+
+    width = 2 * numpy.pi / n_columns # All boxes are the same width
+    indices = numpy.arange(len(labels)) + leading_labels + empty_rows*n_columns
+    x = indices * 2 * numpy.pi / n_columns
+    bottom = indices / n_columns
+    if not spiral:
+        bottom = bottom.astype(int)
+    colors = [m(y) if y!= -1 else 'white' for y in labels]
+    ax.bar(x, height=1, width=width, bottom=bottom, align='edge', color=colors)
+    #for i, y in enumerate(labels):
+    #    x = i * 2 * numpy.pi / n_columns
+    #    bottom = i / n_columns
+    #    if not spiral:
+    #        bottom = int(bottom)
+
+    #    ax.bar(x, height=1, width=width, bottom=bottom, color=m(y))
+    if spiral:
+        plt.ylim(0,n_rows+1)
+    else:
+        plt.ylim(0,n_rows)
+    ax.set_yticks([])
+
+    ax.set_xticks(2 * numpy.pi * numpy.arange(len(xticklabels)) /
+                  len(xticklabels))
+    ax.set_xticklabels(xticklabels)
+
+    ax.set_theta_direction(-1)
+    ax.set_theta_offset(numpy.pi/2.0)
+    handles = [mpatches.Patch(color=m(i), label=y) for i, y in
+               enumerate(label_names)]
+    ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(-0.2, 1.1),
+              ncol=1, fontsize=7 )
+    return fig, ax

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy.ma as ma
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -52,7 +52,7 @@ def get_raw_ts_X_y():
     rts = RandomTimeSeries(generator_list, labels=labels,
                            priors=[5, 2, 4, 9, 3, 3], samplesize='1Min')
 
-    ts, X, y = rts.generate('03-01-2019', '03-05-2019')
+    ts, X, y = rts.generate('01-03-2019', '09-03-2019')
     return ts, X, y, labels, features
 
 
@@ -73,7 +73,7 @@ def split_train_test(ts, X, y):
 def get_classifier_grid():
     # Create cross-validation partitions from training
     # This should select the best set of parameters
-    cv = StratifiedKFold(n_splits=5, shuffle=False)
+    cv = StratifiedKFold(n_splits=3, shuffle=False)
 
     models = {'rf': {'model': RandomForestClassifier(),
                      'parameters': {'n_estimators': [200],
@@ -114,9 +114,60 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     ax = fig.add_subplot(2, 1, 1)
     fig, ax = labels_figure(y_pred, ts=ts, labels=labels, fig=fig, ax=ax)
     ax = fig.add_subplot(2, 1, 2)
-    df_X = pd.DataFrame(X, index=ts).resample('10Min').agg('mean')
+    df_X = pd.DataFrame(X, index=ts).resample('15Min').agg('mean')
     fig, ax = features_figure(df_X.values, ts=df_X.index, feature_names=features, fig=fig, ax=ax)
     fig.savefig('predictions.svg')
+
+    # Ongoing example of polar plot
+    from visualisations import polar_labels_figure
+    def most_common(x):
+        if len(x) == 0:
+            return -1
+        return np.argmax(np.bincount(x))
+
+    resample = '1H'
+    df_labels = pd.DataFrame(y_pred, columns=['label'], index=ts).resample(resample).agg(most_common)
+
+    # Add NaN at the beginning for days before installation
+    first_day = df_labels.index[0].replace(hour=0, minute=0, second=0,
+                                         microsecond=0)
+    previous_monday = first_day + timedelta(days=-first_day.weekday())
+    leading_labels = (first_day - previous_monday) / resample
+    df_labels = pd.concat([pd.DataFrame(data=-1, index=[previous_monday],
+                                        columns=['label']),
+                           df_labels])
+    df_labels = df_labels.resample(resample).agg('first')
+    df_labels = df_labels.fillna(-1)
+
+    # Number of columns in one week
+    n_columns = int(pd.Timedelta('1D') /
+                     pd.Timedelta(resample))
+    weekly = False
+    if weekly:
+        n_columns *= 7
+        xticklabels = ('Mon 00:00', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
+                       'Sun')
+        filename = 'labels_weekly.svg'
+    else:
+        xticklabels = ('24', '1', '2', '3', '4', '5', '6', '7',
+                       '8', '9', '10', '11', '12', '13', '14', '15',
+                       '16', '17', '18', '19', '20', '21', '22', '23')
+        filename = 'labels_daily.svg'
+
+    # Add carrying -1 (denoting NaNs)
+    y_labels = df_labels['label'].values
+    y_labels = np.concatenate((y_labels, -
+                               np.ones(int(np.ceil(len(y_labels)/n_columns)*n_columns)
+                                     - len(y_labels))))
+    # Create a rectangular matrix with (number_weeks x labels_per_week)
+    # Int this case every week has n_columns
+    y_labels = y_labels.reshape((-1, n_columns)).astype(int)
+
+    fig, ax = polar_labels_figure(y_labels, labels, xticklabels,
+                                  empty_rows=0, leading_labels=0, spiral=True,
+                                  title=None, m=None)
+    fig.savefig(filename)
+
 
 if __name__ == '__main__':
     ts, X, y, labels, features = get_raw_ts_X_y()
