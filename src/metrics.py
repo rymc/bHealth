@@ -1,9 +1,19 @@
 import numpy as np
+import pandas as pd
 import scipy.stats
 
 class Metrics:
 
     def __init__(self, timestamps, aggregation_duration, window_overlap):
+
+        # if aggregation_duration == 'day':
+        #     duration = 86400
+        # elif aggregation_duration == 'hour':
+        #     duration = 3600
+        # elif aggregation_duration == 'minute':
+        #     duration = 60
+        # elif aggregation_duration == 'second':
+        #     duration = 1
 
         sampling_frequency = self.establish_sampling_frequency(timestamps)
 
@@ -40,7 +50,7 @@ class Metrics:
 
         number_of_instances = len(labels)
         number_of_labels = len(unique_lab)
-        total_time_in_window = timestamps[-1] - timestamps[0]
+        total_time_in_window = timestamps.iloc[-1] - timestamps.iloc[0]
 
         label_time_array = np.zeros((number_of_labels, 2))
 
@@ -58,20 +68,12 @@ class Metrics:
         """Return a confusion matrix of the number of label changes in a window."""
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
-        number_of_instances = len(labels)
-        number_of_labels = len(unique_lab)
-        total_time_in_window = timestamps[-1] - timestamps[0]
+        print(unique_lab)
 
-        label_change_array = np.zeros((number_of_labels, number_of_labels))
+        label_change_array = np.zeros((max(unique_lab)+1, max(unique_lab)+1))
 
-        for idx_outer in range(number_of_labels):
-            lab_instance_outer = labels[idx_outer]
-            for idx_inner in range(number_of_labels):
-                lab_instance_inner = labels[idx_inner]
-                for idx in range(number_of_instances - 1):
-
-                    if labels[idx] == lab_instance_outer and labels[idx+1] == lab_instance_inner:
-                        label_change_array[int(idx_outer), int(idx_inner)] += 1
+        for idx, lab in labels.iloc[1:].iterrows():
+            label_change_array[int(labels.loc[idx-1]), int(labels.loc[idx])] += 1
 
         return label_change_array
 
@@ -83,37 +85,37 @@ class Metrics:
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
         sampling_frequency = []
-        for idx, time in enumerate(timestamps):
-            if idx >= 1:
-                sampling_frequency.append(time - previous_time)
-            previous_time = time
+        for idx, time in (timestamps.iloc[1:].iterrows()):
+            sampling_frequency.append(timestamps.loc[idx].values - timestamps.loc[idx-1].values)
 
         sampling_frequency = 1 / np.mean(sampling_frequency)
 
         number_of_instances = len(labels)
         number_of_labels = len(unique_lab)
-        total_time_in_window = timestamps[-1] - timestamps[0]
 
         inter_label_times = []
 
         average_per_label = np.zeros((number_of_labels, 1))
 
         for idx_outer in range(number_of_labels):
-            lab_instance_outer = labels[idx_outer]
+            lab_instance_outer = labels.iloc[idx_outer]
             for idx in range(number_of_instances):
-                if labels[idx] == lab_instance_outer:
-                    inter_label_times.append(timestamps[idx])
+                if (labels.iloc[idx] == lab_instance_outer).any():
+                    inter_label_times.append(np.squeeze(timestamps.iloc[idx].values))
 
             inter_label_times = np.diff(inter_label_times)
 
             if normalise:
                 deletion_array = []
                 for idx, time in enumerate(inter_label_times):
-                    if np.isclose(time, sampling_frequency):
+                    if np.isclose(time, (1/sampling_frequency)):
                         deletion_array.append(idx)
                 inter_label_times = np.delete(inter_label_times, deletion_array)
 
-            average_per_label[idx_outer] = np.mean(inter_label_times)
+            if inter_label_times.size == 0:
+                average_per_label[idx_outer] = 0
+            else:
+                average_per_label[idx_outer] = np.mean(inter_label_times)
             inter_label_times = []
 
         return average_per_label
@@ -121,10 +123,8 @@ class Metrics:
     def establish_sampling_frequency(self, timestamps):
         """Return the most likely sampling frequency from the timestamps in a time window."""
         sampling_frequency = []
-        for idx, time in enumerate(timestamps):
-            if idx >= 1:
-                sampling_frequency.append(time - previous_time)
-            previous_time = time
+        for idx, time in (timestamps.iloc[1:].iterrows()):
+            sampling_frequency.append(timestamps.loc[idx].values - timestamps.loc[idx-1].values)
 
         sampling_frequency = 1 / np.mean(sampling_frequency)
 
@@ -141,3 +141,23 @@ class Metrics:
         if update:
             self.current_position += self.window_overlap
         return window
+
+    def localisation_metrics(self, labels, timestamps):
+        """Outputs typical localisation metrics."""
+        # Room Transfers - Daily average
+            # Find all timestamps within a time window
+        df_time = pd.DataFrame(timestamps)
+        #
+
+        # TODO Number of times bathroom visited during the night
+        # TODO Number of times kitchen visited during the night
+
+    def activity_metrics(self, labels, timestamps):
+        """Outputs typical activity metrics."""
+        # Number of times activities undertaken (e.g. cooking / cleaning) - Daily average
+        # Walking - Hourly average
+        # Sitting - Hourly average
+        # Lying - Hourly average
+        # walking - Daily average
+        # Main Sleep Length - Daily average
+        # Total Sleep Length - Daily average
