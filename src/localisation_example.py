@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 from scipy import stats
+from datetime import datetime
 
 from glob import glob
 
@@ -14,6 +15,10 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import StratifiedKFold
 
+import matplotlib.pyplot as plt
+
+from metrics import Metrics
+
 def data_loader():
 
     window = 10  # in seconds
@@ -22,7 +27,7 @@ def data_loader():
 
     folders = glob(data_directory)
 
-    ts = []
+    ts = np.array([]).reshape(0, 1)
     X = []
     y = []
 
@@ -30,99 +35,105 @@ def data_loader():
 
     for idx, fold in enumerate(folders):
 
-        print('Running folder: ', idx + 1)
+        if idx == 0:
 
-        fold_data = [fold + 'rx_wearable_data.csv']
-        fold_data = ''.join(fold_data)
+            print('Running folder: ', idx + 1)
 
-        data = pd.read_csv(fold_data, skiprows=1, usecols=[0, 1, 3])
+            fold_data = [fold + 'rx_wearable_data.csv']
+            fold_data = ''.join(fold_data)
 
-        acc = data
-        acc.columns = ['ts', 'ap', 'rssi']
-        acc['ts'] = pd.to_datetime(acc['ts'])
+            data = pd.read_csv(fold_data, skiprows=1, usecols=[0, 1, 3])
 
-        ts_ = acc[['ts']].values
-        rssi_ = acc[['rssi']].values
-        ap_ = acc[['ap']].values
+            acc = data
+            acc.columns = ['ts', 'ap', 'rssi']
+            acc['ts'] = pd.to_datetime(acc['ts'])
 
-        unique_aps_ = np.unique(ap_)
+            ts_ = acc[['ts']].values
+            rssi_ = acc[['rssi']].values
+            ap_ = acc[['ap']].values
 
-        for idx_ts, t in enumerate(ts_):
-            ts_[idx_ts] = t[0].timestamp()
+            unique_aps_ = np.unique(ap_)
 
-        fold_labels = [fold + 'tag_annotations.csv']
-        fold_labels = ''.join(fold_labels)
+            for idx_ts, t in enumerate(ts_):
+                ts_[idx_ts] = t[0].timestamp()
 
-        tag_data = pd.read_csv(fold_labels, skiprows=1, usecols=[0, 2])
+            fold_labels = [fold + 'tag_annotations.csv']
+            fold_labels = ''.join(fold_labels)
 
-        labs = tag_data
-        labs.columns = ['ts', 'tag']
-        labs['ts'] = pd.to_datetime(labs['ts'])
+            tag_data = pd.read_csv(fold_labels, skiprows=1, usecols=[0, 2])
 
-        ts_lab_ = labs[['ts']].values
-        tag_ = labs[['tag']].values
+            labs = tag_data
+            labs.columns = ['ts', 'tag']
+            labs['ts'] = pd.to_datetime(labs['ts'])
 
-        for idx_ts_lab, t in enumerate(ts_lab_):
-            ts_lab_[idx_ts_lab] = t[0].timestamp()
+            ts_lab_ = labs[['ts']].values
+            tag_ = labs[['tag']].values
 
-        min_rss = ts_.min()
-        min_lab = ts_lab_.min()
-        max_rss = ts_.max()
-        max_lab = ts_lab_.max()
+            for idx_ts_lab, t in enumerate(ts_lab_):
+                ts_lab_[idx_ts_lab] = t[0].timestamp()
 
-        if min_rss > min_lab:
-            first_ts = ts_lab_[0]
-        else:
-            first_ts = ts_[0]
+            min_rss = ts_.min()
+            min_lab = ts_lab_.min()
+            max_rss = ts_.max()
+            max_lab = ts_lab_.max()
 
-        if max_rss > max_lab:
-            last_ts = ts_lab_[-1]
-        else:
-            last_ts = ts_[-1]
+            if min_rss > min_lab:
+                first_ts = ts_lab_[0]
+            else:
+                first_ts = ts_[0]
 
-        permutable = int((last_ts - first_ts) / window)
+            if max_rss > max_lab:
+                last_ts = ts_lab_[-1]
+            else:
+                last_ts = ts_[-1]
 
-        rolling_index = first_ts
+            permutable = int((last_ts - first_ts) / window)
 
-        for idx_sync in range(permutable):
-            X_inter = []
-            y_inter = []
-            ts_inter = []
-            range_min = rolling_index
-            range_max = rolling_index + window
-            ts_inter.append(range_min)
-            for ap_idx in unique_aps_:
-                tag_masked = tag_[(ts_lab_ > range_min) & (ts_lab_ <= range_max)]
+            rolling_index = first_ts
 
-                if tag_masked.size != 0:
-                    y_inter.append(stats.mode(tag_masked)[0])
-                    rssi_masked = rssi_[(ts_ > range_min) & (ts_ <= range_max)]
-                    ap_masked = ap_[(ts_ > range_min) & (ts_ <= range_max)]
-                    rssi_masked = rssi_masked[ap_masked == ap_idx]
+            for idx_sync in range(permutable):
+                X_inter = []
+                y_inter = []
+                ts_inter = []
+                range_min = rolling_index
+                range_max = rolling_index + window
+                ts_inter.append(range_min)
+                for ap_idx in unique_aps_:
+                    tag_masked = tag_[(ts_lab_ > range_min) & (ts_lab_ <= range_max)]
 
-                    if rssi_masked.size != 0:
-                        X_inter.append(np.mean(rssi_masked))
+                    if tag_masked.size != 0:
+                        y_inter.append(stats.mode(tag_masked)[0])
+                        rssi_masked = rssi_[(ts_ > range_min) & (ts_ <= range_max)]
+                        ap_masked = ap_[(ts_ > range_min) & (ts_ <= range_max)]
+                        rssi_masked = rssi_masked[ap_masked == ap_idx]
+
+                        if rssi_masked.size != 0:
+                            X_inter.append(np.mean(rssi_masked))
+                        else:
+                            X_inter.append(-120)
                     else:
                         X_inter.append(-120)
-                else:
-                    X_inter.append(-120)
-                    y_inter.append(0)
+                        y_inter.append(0)
 
-            X.append(X_inter)
-            y.append(stats.mode(y_inter)[0])
-            ts.append(ts_inter)
-            rolling_index = range_max
+                X.append(X_inter)
+                y.append(stats.mode(y_inter)[0])
+                ts = np.concatenate((ts, ts_inter), axis=0)
+                rolling_index = range_max
 
     X = np.array(X)
     y = np.array(y)
     y = np.squeeze(y)
+
+    for idx, t in enumerate(ts):
+        local = datetime.fromtimestamp(t)
+        ts[idx] = local.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
     return ts, X, y
 
 def get_raw_ts_X_y():
 
     ts, X, y = data_loader()
-    return (), X, y
+    return ts, X, y
 
 
 def preprocess_X_y(ts, X, y):
@@ -186,6 +197,60 @@ def print_summary(clf_grid, X_test, y_test):
     tt_score = clf_grid.score(X_test, y_test)
     print("Train / test split accuracy "+str(tt_score))
 
+def localisation_metrics(labels, timestamps):
+    """Outputs typical localisation metrics."""
+
+    df_time = timestamps.astype('datetime64')
+    df_time = pd.DataFrame(df_time, columns=['Time'])
+    df_label = pd.DataFrame(labels, columns=['Label'])
+
+    unique_days = df_time['Time'].dt.normalize().unique()
+    for day in unique_days:
+        next_day = day + np.timedelta64(1,'D')
+        mask = ((df_time['Time'] > day) & (df_time['Time'] <= next_day))
+        times = df_time.loc[mask]
+        labs = df_label.loc[mask]
+
+        if labs.size > 1:
+
+            #For now, I cast it into posix time to make the metrics easier to analyse. This is because
+            #they assume that the timestamp is in seconds // MK
+
+            times = times.astype(np.int64) // 10**6
+            times = times / 1000
+
+            metr = Metrics(times, 86400, 1)
+            daily_average_label_occurence = metr.average_labels_per_window(labs, times)
+            daily_average_location_stay = metr.duration_of_labels_per_window(labs, times)
+            daily_average_number_of_changes= metr.number_of_label_changes_per_window(labs, times)
+            daily_average_time_between_labels= metr.average_time_between_labels(labs, times)
+
+            hour = day
+            for hr in range(23):
+                next_hour = hour + np.timedelta64(1, 'h')
+                mask = ((df_time['Time'] > hour) & (df_time['Time'] <= next_hour))
+                times = df_time.loc[mask]
+                labs = df_label.loc[mask]
+
+                if labs.size > 1:
+
+                    # For now, I cast it into posix time to make the metrics easier to analyse. This is because
+                    # they assume that the timestamp is in seconds // MK
+
+                    times = times.astype(np.int64) // 10 ** 6
+                    times = times / 1000
+
+                    metr = Metrics(times, 3600, 1)
+                    hourly_average_label_occurence = metr.average_labels_per_window(labs, times)
+                    hourly_average_location_stay = metr.duration_of_labels_per_window(labs, times)
+                    hourly_average_number_of_changes = metr.number_of_label_changes_per_window(labs, times)
+                    hourly_average_time_between_labels = metr.average_time_between_labels(labs, times)
+
+                hour = next_hour
+
+
+    # TODO Number of times bathroom visited during the night //MK
+    # TODO Number of times kitchen visited during the night //MK
 
 if __name__ == '__main__':
     ts, X, y = get_raw_ts_X_y()
@@ -194,3 +259,5 @@ if __name__ == '__main__':
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
+    localisation_metrics(y_test, ts)
+
