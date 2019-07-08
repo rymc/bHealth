@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.stats
+from scipy.signal import butter, filtfilt
 
 class Transforms:
 
@@ -81,6 +82,18 @@ class Transforms:
     def kurtosis(x):
         """Return the kurtosis."""
         return scipy.stats.kurtosis(x, fisher=False, bias=True)
+    
+    def _butter_lowpass(cutoff, fs, order=5):
+        nyq = 0.5 * fs
+        normal_cutoff = cutoff / nyq 
+        b, a = butter(order, normal_cutoff, btype='low', analog=False)
+        return b, a
+    
+    @staticmethod
+    def butter_lowpass_filter(data, cutoff, fs, order=5):
+        b, a = _butter_lowpass(cutoff, fs, order=order)
+        y = filtfilt(b, a, data)
+        return y
 
     def slide(self, x, update=True):
         """Slide and return the window of data."""
