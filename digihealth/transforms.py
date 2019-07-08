@@ -90,9 +90,9 @@ class Transforms:
         return b, a
     
     @staticmethod
-    def butter_lowpass_filter(data, cutoff, fs, order=5):
+    def butter_lowpass_filter(x, cutoff, fs, order=5):
         b, a = _butter_lowpass(cutoff, fs, order=order)
-        y = filtfilt(b, a, data)
+        y = filtfilt(b, a, x)
         return y
 
     def slide(self, x, update=True):
