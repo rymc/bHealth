@@ -1,88 +1,18 @@
 import numpy as np
-import numpy.ma as ma
-import numpy.matlib
 import pandas as pd
-from datetime import datetime
-from datetime import timedelta
-
-from glob import glob
+import data_loading
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import StratifiedKFold, GridSearchCV
-
+from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 
 from transforms import Transforms
 from metrics import Metrics
 
-def data_loader():
-
-    global xyz_
-    data_directory = '../data/acc_loc_data/experiments/*/'
-
-    folders = glob(data_directory)
-
-    ts = np.array([[]]).reshape(0, 1)
-    xyz = np.array([[]]).reshape(0, 3)
-    labels = np.array([[]]).reshape(0, 1)
-
-    print('Found', len(folders), 'experiment folders.')
-
-    for idx, fold in enumerate(folders):
-
-        if idx == 0 :
-
-            print('Running folder: ', idx + 1)
-
-            fold_data = [fold + 'accelerometer_filtered.csv']
-            fold_data = ''.join(fold_data)
-
-            data = pd.read_csv(fold_data, skiprows=1, usecols=[0, 4, 5, 6])
-
-            acc = data
-            acc.columns = ['ts', 'x', 'y', 'z']
-            acc['ts'] = pd.to_datetime(acc['ts'])
-
-            ts_ = acc[['ts']].values
-
-            xyz_ = acc[['x', 'y', 'z']].values
-
-            fold_labels = [fold + 'activity_annotation_times.csv']
-            fold_labels = ''.join(fold_labels)
-
-            labs = pd.read_csv(fold_labels)
-
-            labels_ = np.zeros((ts_.size,), dtype=int)
-
-            for lab in labs.itertuples():
-                start_date = pd.to_datetime(lab.timestamp_start)
-                end_date = pd.to_datetime(lab.timestamp_end)
-                label_ = lab.activity_tag
-                mask = (ts_ > start_date) & (ts_ <= end_date)
-
-                for idx_mask, mk in enumerate(mask):
-                    if mk == True:
-                        labels_[idx_mask] = int(label_)
-
-            for idx, t in enumerate(ts_):
-                times = t[0].timestamp()
-                local = datetime.fromtimestamp(times)
-                ts_[idx] = local.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
-
-            labels = np.append(labels, labels_)
-            ts = np.concatenate((ts, ts_), axis=0)
-            xyz = np.concatenate((xyz, xyz_), axis=0)
-
-        labels = labels.astype(int)
-
-    return labels, ts, xyz
-
-
 def get_raw_ts_X_y():
 
-    labels, ts, xyz = data_loader()
+    labels, ts, xyz = data_loading.data_loader_accelerometer()
     return ts, xyz, labels
-
 
 def preprocess_X_y(ts, X, y):
     new_X = []
@@ -164,49 +94,48 @@ def activity_metrics(labels, timestamps):
 
     unique_days = df_time['Time'].dt.normalize().unique()
     for day in unique_days:
-        next_day = day + np.timedelta64(1, 'D')
-        mask = ((df_time['Time'] > day) & (df_time['Time'] <= next_day))
-        times = df_time.loc[mask]
-        labs = df_label.loc[mask]
-
-        if labs.size > 1:
-
-            # For now, I cast it into posix time to make the metrics easier to analyse. This is because
-            # they assume that the timestamp is in seconds // MK
-
-            times = times.astype(np.int64) // 10 ** 6
-            times = times / 1000
-
-            metr = Metrics(times, 86400, 1)
-            daily_average_label_occurence = metr.average_labels_per_window(labs, times)
-            daily_average_location_stay = metr.duration_of_labels_per_window(labs, times)
-            daily_average_number_of_changes = metr.number_of_label_changes_per_window(labs, times)
-            daily_average_time_between_labels = metr.average_time_between_labels(labs, times)
-
             hour = day
+            metric_container = {"timestamp": [], "metrics": []}
             for hr in range(23):
+                hour_container = {}
                 next_hour = hour + np.timedelta64(1, 'h')
                 mask = ((df_time['Time'] > hour) & (df_time['Time'] <= next_hour))
                 times = df_time.loc[mask]
                 labs = df_label.loc[mask]
 
                 if labs.size > 1:
-                    # For now, I cast it into posix time to make the metrics easier to analyse. This is because
-                    # they assume that the timestamp is in seconds // MK
 
                     times = times.astype(np.int64) // 10 ** 6
                     times = times / 1000
 
                     metr = Metrics(times, 3600, 1)
+
                     hourly_average_label_occurence = metr.average_labels_per_window(labs, times)
                     hourly_average_location_stay = metr.duration_of_labels_per_window(labs, times)
                     hourly_average_number_of_changes = metr.number_of_label_changes_per_window(labs, times)
                     hourly_average_time_between_labels = metr.average_time_between_labels(labs, times)
+                else:
+
+                    hourly_average_label_occurence = []
+                    hourly_average_location_stay = []
+                    hourly_average_number_of_changes =[]
+                    hourly_average_time_between_labels = []
+
+                hour_container["label_occurance"] = hourly_average_label_occurence
+                hour_container["label_stay"] = hourly_average_location_stay
+                hour_container["average_number_of_changes"] = hourly_average_number_of_changes
+                hour_container["average_time_between_labels"] = hourly_average_time_between_labels
+
+                metric_container["timestamp"].append(hour)
+                metric_container["metrics"].append(hour_container)
 
                 hour = next_hour
 
+    return metric_container
+
 if __name__ == '__main__':
     ts, X, y = get_raw_ts_X_y()
+    metrics = activity_metrics(y, ts)
     X, y = preprocess_X_y(ts, X, y)
     (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
     clf_grid = get_classifier_grid()

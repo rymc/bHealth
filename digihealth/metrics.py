@@ -84,11 +84,13 @@ class Metrics:
         # assuming a finite set of ordinal labels
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
-        sampling_frequency = []
-        for idx, time in (timestamps.iloc[1:].iterrows()):
-            sampling_frequency.append(timestamps.loc[idx].values - timestamps.loc[idx-1].values)
+        sampling_frequency = 0
+        for idx in range(1, timestamps.size):
+            sampling_frequency = sampling_frequency + (timestamps.loc[idx].values - timestamps.loc[idx - 1].values)
 
-        sampling_frequency = 1 / np.mean(sampling_frequency)
+        sampling_frequency = sampling_frequency / timestamps.size
+
+        sampling_frequency = 1 / sampling_frequency
 
         number_of_instances = len(labels)
         number_of_labels = len(unique_lab)
@@ -122,11 +124,13 @@ class Metrics:
 
     def establish_sampling_frequency(self, timestamps):
         """Return the most likely sampling frequency from the timestamps in a time window."""
-        sampling_frequency = []
-        for idx, time in (timestamps.iloc[1:].iterrows()):
-            sampling_frequency.append(timestamps.loc[idx].values - timestamps.loc[idx-1].values)
+        sampling_frequency = 0
+        for idx in range(1, timestamps.size):
+            sampling_frequency = sampling_frequency + (timestamps.loc[idx].values - timestamps.loc[idx-1].values)
 
-        sampling_frequency = 1 / np.mean(sampling_frequency)
+        sampling_frequency = sampling_frequency / timestamps.size
+
+        sampling_frequency = 1 / sampling_frequency
 
         return sampling_frequency
 
