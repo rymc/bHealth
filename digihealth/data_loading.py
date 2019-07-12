@@ -1,9 +1,12 @@
 import numpy as np
 import pandas as pd
+import datetime
+import time
 
 from scipy import stats
 from datetime import datetime
 from glob import glob
+
 
 def data_loader_accelerometer():
 
@@ -12,6 +15,7 @@ def data_loader_accelerometer():
     data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
 
     ts = np.array([[]]).reshape(0, 1)
+    ts_n = np.array([[]]).reshape(0, 1)
     xyz = np.array([[]]).reshape(0, 3)
     labels = np.array([[]]).reshape(0, 1)
 
@@ -21,7 +25,7 @@ def data_loader_accelerometer():
 
     for idx_house, fold_house in enumerate(folders):
 
-        experiment_folders = glob(fold_house + 'experiments/*/')
+        experiment_folders = glob(fold_house + 'experiments/living*/')
 
         print('Found', len(experiment_folders), 'experiment folders.')
 
@@ -39,6 +43,7 @@ def data_loader_accelerometer():
             acc['ts'] = pd.to_datetime(acc['ts'])
 
             ts_ = acc[['ts']].values
+            ts_n_ = acc[['ts']].values
 
             xyz_ = acc[['x', 'y', 'z']].values
 
@@ -62,13 +67,22 @@ def data_loader_accelerometer():
             for idx, t in enumerate(ts_):
                 times = t[0].timestamp()
                 local = datetime.fromtimestamp(times)
+                ts_n_[idx] = times
                 ts_[idx] = local.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
             labels = np.append(labels, labels_)
+            ts_n = np.concatenate((ts_n, ts_n_), axis=0)
             ts = np.concatenate((ts, ts_), axis=0)
             xyz = np.concatenate((xyz, xyz_), axis=0)
 
             labels = labels.astype(int)
+            ts_n = ts_n.astype(float)
+
+    sort_index = np.argsort(ts_n, axis=None)
+
+    labels = labels[sort_index]
+    ts = ts[sort_index]
+    xyz = xyz[sort_index]
 
     return labels, ts, xyz
 
@@ -88,7 +102,8 @@ def data_loader_rssi():
 
     for idx_house, fold_house in enumerate(folders):
 
-        experiment_folders = glob(fold_house + 'experiments/*/')
+
+        experiment_folders = glob(fold_house + 'experiments/living*/')
 
         print('Found', len(experiment_folders), 'experiment folders.')
 

@@ -67,13 +67,12 @@ class Metrics:
     def number_of_label_changes_per_window(labels, timestamps):
         """Return a confusion matrix of the number of label changes in a window."""
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
-
-        print(unique_lab)
+        labels_ = np.array(labels)
 
         label_change_array = np.zeros((max(unique_lab)+1, max(unique_lab)+1))
 
-        for idx, lab in labels.iloc[1:].iterrows():
-            label_change_array[int(labels.loc[idx-1]), int(labels.loc[idx])] += 1
+        for idx, lab in enumerate(labels_):
+            label_change_array[int(labels_[idx-1]), int(labels_[idx])] += 1
 
         return label_change_array
 
@@ -84,11 +83,13 @@ class Metrics:
         # assuming a finite set of ordinal labels
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
+        timestamps_ = np.array(timestamps)
         sampling_frequency = 0
-        for idx in range(1, timestamps.size):
-            sampling_frequency = sampling_frequency + (timestamps.loc[idx].values - timestamps.loc[idx - 1].values)
+        for idx in range(1, len(timestamps_)):
+            if (timestamps_[idx] - timestamps_[idx - 1]) < 100:
+                sampling_frequency = sampling_frequency + (timestamps_[idx] - timestamps_[idx - 1])
 
-        sampling_frequency = sampling_frequency / timestamps.size
+        sampling_frequency = sampling_frequency / len(timestamps_)
 
         sampling_frequency = 1 / sampling_frequency
 
@@ -124,11 +125,13 @@ class Metrics:
 
     def establish_sampling_frequency(self, timestamps):
         """Return the most likely sampling frequency from the timestamps in a time window."""
+        timestamps_ = np.array(timestamps)
         sampling_frequency = 0
-        for idx in range(1, timestamps.size):
-            sampling_frequency = sampling_frequency + (timestamps.loc[idx].values - timestamps.loc[idx-1].values)
+        for idx in range(1, len(timestamps_)):
+            if (timestamps_[idx] - timestamps_[idx - 1]) < 100:
+                sampling_frequency = sampling_frequency + (timestamps_[idx] - timestamps_[idx - 1])
 
-        sampling_frequency = sampling_frequency / timestamps.size
+        sampling_frequency = sampling_frequency / len(timestamps_)
 
         sampling_frequency = 1 / sampling_frequency
 

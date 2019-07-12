@@ -95,6 +95,7 @@ def activity_metrics(labels, timestamps):
     unique_days = df_time['Time'].dt.normalize().unique()
     for day in unique_days:
             hour = day
+            print(hour)
             metric_container = {"timestamp": [], "metrics": []}
             for hr in range(23):
                 hour_container = {}
@@ -110,18 +111,19 @@ def activity_metrics(labels, timestamps):
 
                     metr = Metrics(times, 3600, 1)
 
-                    hourly_average_label_occurence = metr.average_labels_per_window(labs, times)
+                    hourly_average_label_occurrence = metr.average_labels_per_window(labs, times)
                     hourly_average_location_stay = metr.duration_of_labels_per_window(labs, times)
                     hourly_average_number_of_changes = metr.number_of_label_changes_per_window(labs, times)
                     hourly_average_time_between_labels = metr.average_time_between_labels(labs, times)
+
                 else:
 
-                    hourly_average_label_occurence = []
+                    hourly_average_label_occurrence = []
                     hourly_average_location_stay = []
                     hourly_average_number_of_changes =[]
                     hourly_average_time_between_labels = []
 
-                hour_container["label_occurance"] = hourly_average_label_occurence
+                hour_container["label_occurrence"] = hourly_average_label_occurrence
                 hour_container["label_stay"] = hourly_average_location_stay
                 hour_container["average_number_of_changes"] = hourly_average_number_of_changes
                 hour_container["average_time_between_labels"] = hourly_average_time_between_labels
