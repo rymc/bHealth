@@ -1,7 +1,9 @@
+import sys
+sys.path.append('../')
 
 import pandas as pd
 import numpy as np
-import data_loading
+from digihealth import data_loading
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -14,7 +16,8 @@ from sklearn.model_selection import StratifiedKFold
 
 import matplotlib.pyplot as plt
 
-from metrics import Metrics
+from digihealth import transforms
+from digihealth import metrics
 
 def get_raw_ts_X_y():
 

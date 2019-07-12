@@ -1,13 +1,16 @@
+import sys
+sys.path.append('../')
+
 import numpy as np
 import pandas as pd
-import data_loading
+from digihealth import data_loading
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 
-from transforms import Transforms
-from metrics import Metrics
+from digihealth import transforms
+from digihealth import metrics
 
 def get_raw_ts_X_y():
 

@@ -11,7 +11,6 @@ from glob import glob
 def data_loader_accelerometer():
 
     global xyz_
-    #data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/experiments/*/'
     data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
 
     ts = np.array([[]]).reshape(0, 1)

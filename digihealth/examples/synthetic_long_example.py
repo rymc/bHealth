@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 import os
 import pandas as pd
 import numpy as np
@@ -20,6 +23,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import StratifiedKFold
 
+from digihealth import synthetic
 from synthetic import RandomTimeSeries
 
 
@@ -31,26 +35,26 @@ def get_raw_ts_X_y():
                         ) + np.random.randn(n_samples, size)
 
     n_features = 7
-    features = ['Acceleration X', 'Acceleration Y', 'Acceleration Z']
-    # First example
-    generator_list = [lambda: np.random.randn(np.random.randint(1, 100), 3)/2
-                                + [0, -1, 0],
-                      lambda: np.random.randn(np.random.randint(10, 300), 3)/2
-                                + [0, 0, -1],
-                      lambda: sin_gaussian_rand(np.random.randint(15, 300), 3)
-                                + [0, -1, 0],
-                      lambda: sin_gaussian_rand(np.random.randint(30, 90), 3)*2
-                                + [0, 0, -1],
-                      lambda: np.random.randn(np.random.randint(5*60, 10*60), 3)/16
-                                + [-0.5, 0.5, 0]
-                     ]
+    features = ['rssi bathroom', 'rssi bedroom 1', 'rssi stairs', 'rssi hall',
+                'rssi kitchen', 'rssi living room']
+    generator_list = [
+        lambda: np.random.randn(np.random.randint(2, 6), n_features)
+                + [3, 1, 0, 1, 0, 0, 0],
+        lambda: sin_gaussian_rand(np.random.randint(5*6, 8*6), n_features)
+                + [0, 4, 1, 2, 1, 1, 0],
+        lambda: np.random.randn(np.random.randint(3, 9), n_features)
+                + [0, 1, 0, 5, 0, 0, 1],
+        lambda: sin_gaussian_rand(np.random.randint(1, 9), n_features)
+                + [1, 1, 0, 1, 2, 4, 3],
+        lambda: np.random.randn(np.random.randint(3, 12), n_features)
+                + [0, 1, 1, 0, 2, 3, 9],
+                ]
 
-    labels = ['stand', 'sit', 'walk', 'run', 'sleep']
+    labels = ['bathroom', 'bedroom 1', 'bedroom 2', 'kitchen', 'living room']
     rts = RandomTimeSeries(generator_list, labels=labels,
-                           priors=[3, 4, 2, 1, 1], samplesize='1Min')
+                           priors=[5, 2, 4, 3, 3], samplesize='10Min')
 
-    ts, X, y = rts.generate('06/02/2019', '27/02/2019')
-
+    ts, X, y = rts.generate('01-01-2019', '05-04-2019')
     return ts, X, y, labels, features
 
 
@@ -105,17 +109,7 @@ def print_summary(clf_grid, X_test, y_test):
 
 
 def generate_visualisations(clf, X, y, ts, labels, features):
-    from visualisations import labels_figure
-    from visualisations import features_figure
     y_pred = clf.predict(X)
-    fig = plt.figure(figsize=(10, 4))
-    ax = fig.add_subplot(2, 1, 1)
-    fig, ax = labels_figure(y_pred, ts=ts, labels=labels, fig=fig, ax=ax)
-    ax = fig.add_subplot(2, 1, 2)
-    df_X = pd.DataFrame(X, index=ts).resample('15Min').agg('mean')
-    fig, ax = features_figure(df_X.values, ts=df_X.index, feature_names=features, fig=fig, ax=ax)
-    fig.savefig('predictions.svg')
-
     # Ongoing example of polar plot
     from visualisations import polar_labels_figure
     def most_common(x):
@@ -123,7 +117,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
             return -1
         return np.argmax(np.bincount(x))
 
-    resample = '15Min'
+    resample = '2H'
     df_labels = pd.DataFrame(y_pred, columns=['label'], index=ts).resample(resample).agg(most_common)
 
     # Add NaN at the beginning for days before installation
@@ -141,10 +135,10 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     n_columns = int(pd.Timedelta('1D') /
                      pd.Timedelta(resample))
 
-    xticklabels = ('24', '1', '2', '3', '4', '5', '6', '7',
-                   '8', '9', '10', '11', '12', '13', '14', '15',
-                   '16', '17', '18', '19', '20', '21', '22', '23')
-    filename = 'labels_daily.png'
+    n_columns *= 7
+    xticklabels = ('Mon 00:00', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
+                   'Sun')
+    filename = 'labels_weekly.png'
 
     # Add carrying -1 (denoting NaNs)
     y_labels = df_labels['label'].values
