@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.transforms import Transforms
+from digihealth.transforms import Transforms
 
 class TestTransforms(unittest.TestCase):
     def test_mean_crossings(self):

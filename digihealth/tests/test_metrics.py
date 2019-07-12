@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.metrics import Metrics
+from digihealth.metrics import Metrics
 
 class TestMetrics(unittest.TestCase):
 
