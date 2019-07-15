@@ -50,7 +50,8 @@ class Metrics:
 
         number_of_instances = len(labels)
         number_of_labels = len(unique_lab)
-        total_time_in_window = timestamps.iloc[-1] - timestamps.iloc[0]
+        timestamps = np.array(timestamps)
+        total_time_in_window = timestamps[-1] - timestamps[0]
 
         label_time_array = np.zeros((number_of_labels, 2))
 
@@ -69,12 +70,32 @@ class Metrics:
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
         labels_ = np.array(labels)
 
-        label_change_array = np.zeros((max(unique_lab)+1, max(unique_lab)+1))
+        label_change_array = np.zeros((len(unique_lab), len(unique_lab)))
 
         for idx, lab in enumerate(labels_):
-            label_change_array[int(labels_[idx-1]), int(labels_[idx])] += 1
+            label_change_array[int(labels_[idx-1] - 1), int(labels_[idx] - 1)] += 1
 
         return label_change_array
+
+    @staticmethod
+    def speed(labels, timestamps, adjacency):
+        """Return approximate speed of a person given the timestamps and the rate of change of labels, given their distance."""
+        unique_lab, counts_lab = np.unique(labels, return_counts=True)
+        labels_ = np.array(labels)
+        adjacency = np.array(adjacency)
+        timestamps = np.array(timestamps)
+
+        label_change_array = np.zeros(len(labels))
+        label_time_array = np.zeros(len(labels))
+
+        for idx in range(1, len(labels_)):
+            label_change_array[idx] += adjacency[int(labels_[idx - 1]) - 1, int(labels_[idx]) - 1]
+            label_time_array[idx] += timestamps[idx - 1] - timestamps[idx]
+
+        distances = np.divide(label_change_array, label_time_array)
+        speed = np.abs(np.nanmean(distances))
+
+        return speed
 
     @staticmethod
     def average_time_between_labels(labels, timestamps, normalise=True):
