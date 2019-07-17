@@ -1,5 +1,11 @@
 import numpy as np
 import scipy.stats
+
+from sklearn.feature_selection import SelectFromModel
+from sklearn.svm import LinearSVC
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.feature_selection import chi2
+from sklearn.feature_selection import SelectKBest
 from scipy.signal import butter, filtfilt
 
 class Transforms:
@@ -106,3 +112,17 @@ class Transforms:
         if update:
             self.current_position += self.window_overlap
         return window
+
+    def feature_selection(self, X, y, method):
+        """Feature selection method."""
+        if method == 'tree':
+            clf = ExtraTreesClassifier(n_estimators=50)
+            clf = clf.fit(X, y)
+            model = SelectFromModel(clf, prefit=True)
+            X_new = model.transform(X)
+        elif method == 'l1':
+            lsvc = LinearSVC(C=0.01, penalty="l1", dual=False).fit(X, y)
+            model = SelectFromModel(lsvc, prefit=True)
+            X_new = model.transform(X)
+
+        return X_new

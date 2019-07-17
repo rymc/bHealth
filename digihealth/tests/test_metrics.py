@@ -128,7 +128,7 @@ class TestMetrics(unittest.TestCase):
         groundtruth = [[ [ 2, 2 ], [ 2, 2 ] ]]
 
         indicies = np.arange(len(labels))
-        metr = Metrics(timestamp, aggregation_duration=9, window_overlap=1)
+        metr = Metrics(timestamp, aggregation_duration=9, window_overlap=0)
 
         metr.current_position = winlength
         final_result = []
@@ -202,7 +202,7 @@ class TestMetrics(unittest.TestCase):
         #monotonically increasing
         timestamp = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-        groundtruth = [[ [ 3 ], [ 4 ] ]]
+        groundtruth = [[ [ 2 ], [ 2 ] ]]
 
         indicies = np.arange(len(labels))
         metr = Metrics(timestamp, aggregation_duration=9, window_overlap=1)

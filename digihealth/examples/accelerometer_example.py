@@ -9,8 +9,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 
-from digihealth import transforms
-from digihealth import metrics
+from digihealth.transforms import Transforms
+from digihealth.metrics import Metrics
 
 def get_raw_ts_X_y():
 
@@ -21,7 +21,7 @@ def preprocess_X_y(ts, X, y):
     new_X = []
     new_y = []
 
-    winlength_seconds = 3
+    winlength_seconds = 10
     overlap_seconds = 1
     print("Window size of "+str(winlength_seconds)+" seconds and overlap of "+str(float(overlap_seconds) / winlength_seconds)+"%")
     samples_per_sec = 50
@@ -31,7 +31,15 @@ def preprocess_X_y(ts, X, y):
 
     transform = Transforms(window_length=winlength, window_overlap=overlap)
     print("Use number of mean crossings, spectral entropy as features...")
-    feature_transforms = [transform.mean_crossings, transform.spec_entropy]
+    feature_transforms = [transform.mean_crossings,
+                          transform.spec_entropy,
+                          transform.zero_crossings,
+                          transform.interq,
+                          transform.skewn,
+                          transform.spec_energy,
+                          transform.p25,
+                          transform.p75,
+                          transform.kurtosis]
 
     while True:
         windowed_raw = transform.slide(X)
@@ -54,6 +62,8 @@ def preprocess_X_y(ts, X, y):
     # Remove datetime from features
     new_X = new_X[:, 1:]
     new_y = np.array(new_y)
+
+    new_X = transform.feature_selection(new_X, new_y, 'uni')
 
     return new_X, new_y
 
@@ -140,7 +150,6 @@ def activity_metrics(labels, timestamps):
 
 if __name__ == '__main__':
     ts, X, y = get_raw_ts_X_y()
-    metrics = activity_metrics(y, ts)
     X, y = preprocess_X_y(ts, X, y)
     (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
     clf_grid = get_classifier_grid()

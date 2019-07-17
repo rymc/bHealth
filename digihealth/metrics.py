@@ -17,7 +17,7 @@ class Metrics:
 
         sampling_frequency = self.establish_sampling_frequency(timestamps)
 
-        indexing = aggregation_duration/sampling_frequency
+        indexing = aggregation_duration/np.floor(sampling_frequency)
 
         if (indexing % 2) != 0:
             indexing = np.ceil(indexing)
@@ -72,8 +72,8 @@ class Metrics:
 
         label_change_array = np.zeros((len(unique_lab), len(unique_lab)))
 
-        for idx, lab in enumerate(labels_):
-            label_change_array[int(labels_[idx-1] - 1), int(labels_[idx] - 1)] += 1
+        for idx in range(1, len(labels_)):
+            label_change_array[int(np.where(unique_lab == labels_[idx-1])[0][0]), int(np.where(unique_lab == labels_[idx])[0][0])] += 1
 
         return label_change_array
 
@@ -89,7 +89,7 @@ class Metrics:
         label_time_array = np.zeros(len(labels))
 
         for idx in range(1, len(labels_)):
-            label_change_array[idx] += adjacency[int(labels_[idx - 1]) - 1, int(labels_[idx]) - 1]
+            label_change_array[idx] += adjacency[int(np.where(unique_lab == labels_[idx-1])[0][0]), int(np.where(unique_lab == labels_[idx])[0][0])]
             label_time_array[idx] += timestamps[idx - 1] - timestamps[idx]
 
         distances = np.divide(label_change_array, label_time_array)
@@ -115,6 +115,7 @@ class Metrics:
         sampling_frequency = 1 / sampling_frequency
 
         number_of_instances = len(labels)
+        labels_ = np.array(labels)
         number_of_labels = len(unique_lab)
 
         inter_label_times = []
@@ -122,10 +123,10 @@ class Metrics:
         average_per_label = np.zeros((number_of_labels, 1))
 
         for idx_outer in range(number_of_labels):
-            lab_instance_outer = labels.iloc[idx_outer]
+            lab_instance_outer = labels_[idx_outer]
             for idx in range(number_of_instances):
-                if (labels.iloc[idx] == lab_instance_outer).any():
-                    inter_label_times.append(np.squeeze(timestamps.iloc[idx].values))
+                if (labels_[idx] == lab_instance_outer).any():
+                    inter_label_times.append(np.squeeze(timestamps_[idx]))
 
             inter_label_times = np.diff(inter_label_times)
 

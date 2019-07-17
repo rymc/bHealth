@@ -22,7 +22,7 @@ def data_loader_accelerometer():
 
     print('Found', len(folders), 'house folders.')
 
-    for idx_house, fold_house in enumerate(folders):
+    for idx_house, fold_house in enumerate(['../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house_B/']):
 
         experiment_folders = glob(fold_house + 'experiments/living*/')
 
