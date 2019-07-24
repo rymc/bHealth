@@ -1,9 +1,24 @@
+"""
+test_transforms.py
+====================================
+Unit tests for Transforms class.
+"""
+
 import unittest
 import numpy as np
 from digihealth.transforms import Transforms
 
 class TestTransforms(unittest.TestCase):
+    """
+    Unit test class for Transforms.
+
+    If you want to add your own quality function, do it here.
+    """
+
     def test_mean_crossings(self):
+        """
+        Test mean crossings.
+        """
         x_list = [[-1, -1, -1],
                   [0, 0, 0],
                   [1, 5, 9],
@@ -38,6 +53,9 @@ class TestTransforms(unittest.TestCase):
             self.assertEqual(final_result, y)
 
     def test_zero_crossings(self):
+        """
+        Test zero crossings.
+        """
         x_list = [[-1, -1, -1],
                   [0, 0, 0],
                   [1, -4, 5, -10],
@@ -72,6 +90,9 @@ class TestTransforms(unittest.TestCase):
             self.assertEqual(final_result, y)
 
     def test_25_percentiles(self):
+        """
+        Test 25th percentiles.
+        """
         x_list = [[1, 2, 3, 4, 5, 6, 7],
                   [5, 6, 3, 1, 3],
                   [10, -10, -90, -90.5, -100, -200]]
@@ -103,6 +124,9 @@ class TestTransforms(unittest.TestCase):
             np.testing.assert_almost_equal(final_result, y)
 
     def test_75_percentiles(self):
+        """
+        Test 75th percentiles.
+        """
         x_list = [[5, 6, 7, 8, 9],
                   [5,5.5,4.5,4.75,5.35,5.45,6.15],
                   [-10, -40, 50, 2, 4, 5]]
@@ -134,6 +158,9 @@ class TestTransforms(unittest.TestCase):
             np.testing.assert_almost_equal(final_result, y)
 
     def test_interquartiles(self):
+        """
+        Test interquartiles.
+        """
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1,2,3,4,2,3,4,10,5,7,8,11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
@@ -164,36 +191,42 @@ class TestTransforms(unittest.TestCase):
             np.testing.assert_almost_equal(final_result, y)
 
     def test_skewness(self):
-            x_list = [[5, 6, 7, 8, 9, 10],
-                      [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
-                      [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
-            y_list = [0, 0.6486028516711329, 0.05039822936776113]
-            t = Transforms(window_length=1, window_overlap=0)
-            for x, y in zip(x_list, y_list):
-                result = t.skewn(x)
-                np.testing.assert_almost_equal(result, y)
+        """
+        Test skewness.
+        """
+        x_list = [[5, 6, 7, 8, 9, 10],
+                  [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
+                  [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
+        y_list = [0, 0.6486028516711329, 0.05039822936776113]
+        t = Transforms(window_length=1, window_overlap=0)
+        for x, y in zip(x_list, y_list):
+            result = t.skewn(x)
+            np.testing.assert_almost_equal(result, y)
 
-            winlength = 3
-            x_list = [[1, 2, 3, 4, 5, 6, 7],
-                      [5, 6, 3, 1, 3],
-                      [10, -90, -10, -90.5, -100, -200]]
-            y_list = [[0, 0, 0, 0, 0],
-                      [-0.3818018, 0.2390631, -0.7071068],
-                      [-0.5951701, 0.7070141, 0.6778576, -0.687648]]
-            t = Transforms(window_length=winlength, window_overlap=1)
-            for x, y in zip(x_list, y_list):
-                t.current_position = winlength
-                final_result = []
-                while True:
-                    windowed_raw = t.slide(np.array(x))
-                    if len(windowed_raw) > 0 and len(windowed_raw) == winlength:
-                        result = t.skewn(windowed_raw)
-                        final_result.append(result)
-                    else:
-                        break
-                np.testing.assert_almost_equal(final_result, y)
+        winlength = 3
+        x_list = [[1, 2, 3, 4, 5, 6, 7],
+                  [5, 6, 3, 1, 3],
+                  [10, -90, -10, -90.5, -100, -200]]
+        y_list = [[0, 0, 0, 0, 0],
+                  [-0.3818018, 0.2390631, -0.7071068],
+                  [-0.5951701, 0.7070141, 0.6778576, -0.687648]]
+        t = Transforms(window_length=winlength, window_overlap=1)
+        for x, y in zip(x_list, y_list):
+            t.current_position = winlength
+            final_result = []
+            while True:
+                windowed_raw = t.slide(np.array(x))
+                if len(windowed_raw) > 0 and len(windowed_raw) == winlength:
+                    result = t.skewn(windowed_raw)
+                    final_result.append(result)
+                else:
+                    break
+            np.testing.assert_almost_equal(final_result, y)
 
     def test_kurtosis(self):
+        """
+        Test kurtosis.
+        """
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
@@ -224,6 +257,9 @@ class TestTransforms(unittest.TestCase):
             np.testing.assert_almost_equal(final_result, y)
 
     def test_spec_energy(self):
+        """
+        Test spectral energy.
+        """
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
@@ -234,6 +270,9 @@ class TestTransforms(unittest.TestCase):
             np.testing.assert_almost_equal(result, y)
 
     def test_spec_entropy(self):
+        """
+        Test spectral entropy.
+        """
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]

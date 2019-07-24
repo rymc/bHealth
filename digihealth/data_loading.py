@@ -1,14 +1,21 @@
+"""
+data_loading.py
+====================================
+File with data loading functions.
+"""
+
 import numpy as np
 import pandas as pd
 import datetime
-import time
 
 from scipy import stats
 from datetime import datetime
 from glob import glob
 
-
 def data_loader_accelerometer():
+    """
+    Load example accelerometer data.
+    """
 
     global xyz_
     data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
@@ -86,6 +93,9 @@ def data_loader_accelerometer():
     return labels, ts, xyz
 
 def data_loader_rssi():
+    """
+     Load example RSSI data.
+     """
 
     window = 10  # in seconds
 

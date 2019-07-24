@@ -1,10 +1,33 @@
+"""
+metrics.py
+====================================
+Typical health metrics are contained within this class.
+"""
+
 import numpy as np
 import pandas as pd
-import scipy.stats
 
 class Metrics:
+    """
+    Metrics class. This class is used to obtain health metrics from the labels in the data.
+    The subjective interpretation of the output is left to the user.
+
+    If you want to add your own metric function, do it here.
+    """
 
     def __init__(self, timestamps, aggregation_duration, window_overlap):
+        """
+        Metrics constructor.
+
+        Parameters
+        ----------
+        timestamps
+           A vector of timestamps.
+        aggregation_duration
+           Desired aggregation duration.
+        window_overlap
+           Desired overlap of data windows.
+        """
 
         # if aggregation_duration == 'day':
         #     duration = 86400
@@ -28,7 +51,16 @@ class Metrics:
 
     @staticmethod
     def average_labels_per_window(labels, timestamps):
-        """Return the average label proportion per window."""
+        """
+        Return the average label proportion per window.
+
+        Parameters
+        ----------
+        labels
+            A vector containing labels.
+        timestamps
+            A vector containing timestamps.
+        """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
         number_of_instances = len(labels)
@@ -45,7 +77,16 @@ class Metrics:
 
     @staticmethod
     def duration_of_labels_per_window(labels, timestamps):
-        """Return the average duration of a label per window."""
+        """
+        Return the average duration of a label per window.
+
+        Parameters
+        ----------
+        labels
+            A vector containing labels.
+        timestamps
+            A vector containing timestamps.
+        """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
         number_of_instances = len(labels)
@@ -66,7 +107,16 @@ class Metrics:
 
     @staticmethod
     def number_of_label_changes_per_window(labels, timestamps):
-        """Return a confusion matrix of the number of label changes in a window."""
+        """
+        Return a confusion matrix of the number of label changes in a window.
+
+        Parameters
+        ----------
+        labels
+            A vector containing labels.
+        timestamps
+            A vector containing timestamps.
+        """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
         labels_ = np.array(labels)
 
@@ -79,7 +129,16 @@ class Metrics:
 
     @staticmethod
     def speed(labels, timestamps, adjacency):
-        """Return approximate speed of a person given the timestamps and the rate of change of labels, given their distance."""
+        """
+        Return approximate speed of a person given the timestamps and the rate of change of labels, given their distance.
+
+        Parameters
+        ----------
+        labels
+            A vector containing labels.
+        timestamps
+            A vector containing timestamps.
+        """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
         labels_ = np.array(labels)
         adjacency = np.array(adjacency)
@@ -99,7 +158,19 @@ class Metrics:
 
     @staticmethod
     def average_time_between_labels(labels, timestamps, normalise=True):
-        """Return the average time, in seconds, between labels in a window."""
+        """
+        Return the average time, in seconds, between labels in a window.
+
+        Parameters
+        ----------
+        labels
+            A vector containing labels.
+        timestamps
+            A vector containing timestamps.
+        normalise
+
+        """
+
         # normalise parameter attempts to remove sequential labels
         # assuming a finite set of ordinal labels
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
@@ -146,7 +217,14 @@ class Metrics:
         return average_per_label
 
     def establish_sampling_frequency(self, timestamps):
-        """Return the most likely sampling frequency from the timestamps in a time window."""
+        """
+        Return the most likely sampling frequency from the timestamps in a time window.
+
+        Parameters
+        ----------
+        timestamps
+            A vector containing timestamps.
+        """
         timestamps_ = np.array(timestamps)
         sampling_frequency = 0
         for idx in range(1, len(timestamps_)):
@@ -160,7 +238,16 @@ class Metrics:
         return sampling_frequency
 
     def slide(self, index, update=True):
-        """Slide and return the window of data."""
+        """
+        Slide and return the window of data.
+
+        Parameters
+        ----------
+        index
+            Currently holding index of the dataset.
+        update
+            Update the current position of the window index.
+        """
         window = index[self.current_position - self.window_length:self.current_position]
         if len(window) > 0:
             if len(window.shape) > 1:
@@ -170,23 +257,3 @@ class Metrics:
         if update:
             self.current_position += self.window_overlap
         return window
-
-    def localisation_metrics(self, labels, timestamps):
-        """Outputs typical localisation metrics."""
-        # Room Transfers - Daily average
-            # Find all timestamps within a time window
-        df_time = pd.DataFrame(timestamps)
-        #
-
-        # TODO Number of times bathroom visited during the night
-        # TODO Number of times kitchen visited during the night
-
-    def activity_metrics(self, labels, timestamps):
-        """Outputs typical activity metrics."""
-        # Number of times activities undertaken (e.g. cooking / cleaning) - Daily average
-        # Walking - Hourly average
-        # Sitting - Hourly average
-        # Lying - Hourly average
-        # walking - Daily average
-        # Main Sleep Length - Daily average
-        # Total Sleep Length - Daily average

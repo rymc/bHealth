@@ -1,3 +1,9 @@
+"""
+test_quality.py
+====================================
+Unit tests for DataQuality class.
+"""
+
 import unittest
 import numpy as np
 import pandas as pd
@@ -5,8 +11,16 @@ import random
 from digihealth.data_quality import DataQuality
 
 class TestQuality(unittest.TestCase):
+    """
+    Unit test class for DataQuality.
+
+    If you want to add your own quality function, do it here.
+    """
 
     def test_continuity(self):
+        """
+        Test continuity.
+        """
 
         quali = DataQuality(0, 2, 3, 'H')
         #Generate some timestamps
@@ -26,6 +40,9 @@ class TestQuality(unittest.TestCase):
         np.testing.assert_almost_equal(alert_, 1)
 
     def test_variance(self):
+        """
+        Test variance.
+        """
 
         number_of_columns = 5
         number_of_rows = 200
@@ -43,6 +60,9 @@ class TestQuality(unittest.TestCase):
         np.testing.assert_almost_equal(alert_, 1)
 
     def test_anomalies(self):
+        """
+        Test anomalies.
+        """
 
         number_of_columns = 5
         number_of_rows = 200

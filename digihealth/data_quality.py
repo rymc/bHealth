@@ -1,11 +1,36 @@
+"""
+data_quality.py
+====================================
+Data quality methods are contained within this class.
+"""
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 class DataQuality:
+    """
+    Data Quality class is used to give the users some information about your dataset.
+    It can help give the user basic information about the quality of the set. If there are any discrepancies
+    it will raise an 'alert' and print a string.
+
+    If you want to add your own quality function, do it here.
+    """
 
     def __init__(self, time_cols, label_cols, feature_cols, sample_rate):
+        """
+        DataQuality constructor.
 
+        Parameters
+        ----------
+        time_cols
+            Index of the column containing the timestamps.
+        label_cols
+            Index of the column containing the labels.
+        feature_cols
+            Index of the column containing the features.
+        sample_rate
+            Sample rate of the provided data.
+        """
         self.timestamp_columns = time_cols
         self.label_columns = label_cols
         self.feature_columns = feature_cols
@@ -15,13 +40,32 @@ class DataQuality:
 
 
     def evaluate_point(self, point, means, covariances):
+        """
+        Evaluate the probability of a data point given multivariate mean and covariance matrices.
+
+        Parameters
+        ----------
+        point
+            A point to evaluate.
+        means
+            A vector of means to evaluate.
+        covariances
+            A matrix of covariances.
+        """
         m_dist_x = np.dot((point - means).transpose(), np.linalg.inv(covariances))
         m_dist_x = np.dot(m_dist_x, (point - means))
         prob = 1 - stats.chi2.cdf(m_dist_x, 3)
         return prob
 
     def check_continuity(self, timestamps):
-        """Check for continuity in time series data."""
+        """
+        Check the continuity of the dataset.
+
+        Parameters
+        ----------
+        timestamps
+            A vector of timestamps. As default, this can be as numpy time array.
+        """
         df_time = timestamps.values.astype('datetime64')
         number_of_instances_prior = len(df_time)
         x = np.ones(number_of_instances_prior)
@@ -45,7 +89,14 @@ class DataQuality:
         return alert_, reduction
 
     def check_variance(self, dataset):
+        """
+        Check variance in time series data for empty columns.
 
+        Parameters
+        ----------
+        dataset
+            A table of data. This should be formatted as times in dimension 0 and features/data as dimension 1.
+        """
         variance_ = np.zeros(dataset.shape[1])
         alert_ = 0
 
@@ -60,7 +111,14 @@ class DataQuality:
 
 
     def check_anomalies(self, dataset):
+        """
+        Check for outliers in time series data.
 
+        Parameters
+        ----------
+        dataset
+            A table of data. This should be formatted as times in dimension 0 and features/data as dimension 1.
+        """
         threshold = -1000
 
         means_ = np.zeros(dataset.shape[1])

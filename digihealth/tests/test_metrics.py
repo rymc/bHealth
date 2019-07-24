@@ -1,10 +1,24 @@
+"""
+test_metrics.py
+====================================
+Unit tests for Metrics class.
+"""
+
 import unittest
 import numpy as np
 from digihealth.metrics import Metrics
 
 class TestMetrics(unittest.TestCase):
+    """
+    Unit test class for Metrics.
+
+    If you want to add your own quality function, do it here.
+    """
 
     def test_average_activities_per_window(self):
+        """
+        Test average activities per window.
+        """
 
         winlength = 3
 
@@ -60,6 +74,9 @@ class TestMetrics(unittest.TestCase):
             np.testing.assert_almost_equal(x, y)
 
     def test_duration_activities_per_window(self):
+        """
+        Test duration of activities per window.
+        """
 
         winlength = 3
 
@@ -116,6 +133,9 @@ class TestMetrics(unittest.TestCase):
 
 
     def test_average_activity_change_per_window(self):
+        """
+        Test average activity change per window.
+        """
 
         winlength = 9
 
@@ -153,6 +173,9 @@ class TestMetrics(unittest.TestCase):
             np.testing.assert_almost_equal(x, y)
 
     def test_speed(self):
+        """
+        Test speed.
+        """
 
         winlength = 9
 
@@ -193,6 +216,9 @@ class TestMetrics(unittest.TestCase):
 
 
     def test_average_inter_label_durations(self):
+        """
+        Test average inter label durations.
+        """
 
         winlength = 9
 
