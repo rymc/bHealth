@@ -23,8 +23,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import StratifiedKFold
 
-from digihealth import synthetic
-from synthetic import RandomTimeSeries
+from digihealth.synthetic import RandomTimeSeries
+#from synthetic import RandomTimeSeries
 
 
 np.random.seed(42)
@@ -109,8 +109,8 @@ def print_summary(clf_grid, X_test, y_test):
 
 
 def generate_visualisations(clf, X, y, ts, labels, features):
-    from visualisations import labels_figure
-    from visualisations import features_figure
+    from digihealth.visualisations import labels_figure
+    from digihealth.visualisations import features_figure
     y_pred = clf.predict(X)
     fig = plt.figure(figsize=(10, 4))
     ax = fig.add_subplot(2, 1, 1)
@@ -121,7 +121,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     fig.savefig('predictions.svg')
 
     # Ongoing example of polar plot
-    from visualisations import polar_labels_figure
+    from digihealth.visualisations import polar_labels_figure
     def most_common(x):
         if len(x) == 0:
             return -1

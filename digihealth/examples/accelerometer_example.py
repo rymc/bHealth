@@ -63,7 +63,7 @@ def preprocess_X_y(ts, X, y):
     new_X = new_X[:, 1:]
     new_y = np.array(new_y)
 
-    new_X = transform.feature_selection(new_X, new_y, 'uni')
+    new_X = transform.feature_selection(new_X, new_y, 'tree')
 
     return new_X, new_y
 
