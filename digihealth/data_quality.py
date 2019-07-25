@@ -5,6 +5,7 @@ Data quality methods are contained within this class.
 """
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from scipy import stats
 
 class DataQuality:
@@ -16,7 +17,7 @@ class DataQuality:
     If you want to add your own quality function, do it here.
     """
 
-    def __init__(self, time_cols, label_cols, feature_cols, sample_rate):
+    def __init__(self, sample_rate):
         """
         DataQuality constructor.
 
@@ -31,13 +32,20 @@ class DataQuality:
         sample_rate
             Sample rate of the provided data.
         """
-        self.timestamp_columns = time_cols
-        self.label_columns = label_cols
-        self.feature_columns = feature_cols
+
         self.sample_rate = sample_rate
 
-        self.alert_raised_ = 0
-
+        # # Continuity
+        # self.continuity = self.check_continuity(timestamps)
+        #
+        # # Variance
+        # self.variance = self.check_variance(dataset)
+        #
+        # # Anomalies
+        # self.anomalies = self.check_anomalies(dataset)
+        #
+        # # Correlations
+        # self.covariances_, self.pearson_, self.spearman_ = self.check_correlations(dataset)
 
     def evaluate_point(self, point, means, covariances):
         """
@@ -76,17 +84,37 @@ class DataQuality:
         df_time = df_time.ffill()
 
         number_of_instances_post = len(df_time)
-        reduction = (number_of_instances_post - number_of_instances_prior)/number_of_instances_post
+        reduction_ = (number_of_instances_post - number_of_instances_prior)/number_of_instances_post
 
-        if reduction == 0:
+        if reduction_ == 0:
             alert_ = 0
         else:
             alert_ = 1
             self.alert_raised_ = 1
-            red = reduction * 100
+            red = reduction_ * 100
             print('The set appears discontinuous. From what I can see, there is almost', red, 'percent missing. Check for completeness of the data.')
 
-        return alert_, reduction
+        return reduction_
+
+    def check_uniqueness(self, timestamps):
+        """
+        Check the uniqueness of the dataset.
+
+        Parameters
+        ----------
+        timestamps
+            A vector of timestamps. As default, this can be as numpy time array.
+        """
+        uniqueness = 0
+        number_of_instances = timestamps.shape[0]
+
+        unique = np.unique(timestamps)
+        number_of_uniques = len(unique)
+
+        if number_of_instances != number_of_uniques:
+            uniqueness = (number_of_uniques/number_of_instances)
+
+        return uniqueness
 
     def check_variance(self, dataset):
         """
@@ -108,7 +136,6 @@ class DataQuality:
                 self.alert_raised_ = 1
 
         return alert_, variance_
-
 
     def check_anomalies(self, dataset):
         """
@@ -139,4 +166,30 @@ class DataQuality:
                     alert_ = 1
                     self.alert_raised_ = 1
 
-        return alert_, outliers_
+        return outliers_
+
+    def check_correlations(self, dataset):
+        """
+        Check the correlations between variables in the dataset.
+
+        Parameters
+        ----------
+        dataset
+            A table of data. This should be formatted as times in dimension 0 and features/data as dimension 1.
+        """
+        number_of_features = dataset.shape[1]
+
+        covariances_ = np.cov(dataset.T)
+        pearson_ = np.zeros((number_of_features, number_of_features))
+        spearman_ = np.zeros((number_of_features, number_of_features))
+
+        for outer_ in range(0, number_of_features):
+            for inner_ in range(0, number_of_features):
+
+                # check Pearson's
+                pearson_[outer_, inner_], _ = stats.pearsonr(dataset[:, outer_], dataset[:, inner_])
+
+                # check Spearman's
+                spearman_[outer_, inner_], _ = stats.spearmanr(dataset[:, outer_], dataset[:, inner_])
+
+        return covariances_, pearson_, spearman_
