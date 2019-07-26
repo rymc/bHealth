@@ -17,7 +17,6 @@ def data_loader_accelerometer():
     Load example accelerometer data.
     """
 
-    global xyz_
     data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
 
     ts = np.array([[]]).reshape(0, 1)
@@ -29,7 +28,7 @@ def data_loader_accelerometer():
 
     print('Found', len(folders), 'house folders.')
 
-    for idx_house, fold_house in enumerate(['../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house_B/']):
+    for idx_house, fold_house in enumerate(folders):
 
         experiment_folders = glob(fold_house + 'experiments/living*/')
 
@@ -110,7 +109,6 @@ def data_loader_rssi():
     print('Found', len(folders), 'house folders.')
 
     for idx_house, fold_house in enumerate(folders):
-
 
         experiment_folders = glob(fold_house + 'experiments/living*/')
 
