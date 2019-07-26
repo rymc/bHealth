@@ -15,7 +15,7 @@ class Metrics:
     If you want to add your own metric function, do it here.
     """
 
-    def __init__(self, timestamps, aggregation_duration, window_overlap):
+    def __init__(self, timestamps, aggregation_duration, window_overlap, fs=None):
         """
         Metrics constructor.
 
@@ -38,7 +38,10 @@ class Metrics:
         # elif aggregation_duration == 'second':
         #     duration = 1
 
-        sampling_frequency = self.establish_sampling_frequency(timestamps)
+        if fs == None:
+            sampling_frequency = self.establish_sampling_frequency(timestamps)
+        else:
+            sampling_frequency = fs
 
         indexing = aggregation_duration/sampling_frequency
 

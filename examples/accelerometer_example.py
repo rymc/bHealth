@@ -121,7 +121,7 @@ def activity_metrics(labels, timestamps):
                     times = times.astype(np.int64) // 10 ** 6
                     times = times / 1000
 
-                    metr = Metrics(times, 3600, 1)
+                    metr = Metrics(times, 3600, 1, 25)
 
                     hourly_average_label_occurrence = metr.average_labels_per_window(labs, times)
                     hourly_average_location_stay = metr.duration_of_labels_per_window(labs, times)
