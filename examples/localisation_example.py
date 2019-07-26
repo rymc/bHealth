@@ -16,16 +16,17 @@ from sklearn.model_selection import StratifiedKFold
 
 import matplotlib.pyplot as plt
 
-from digihealth import transforms
-from digihealth import metrics
+from digihealth.metrics import Metrics
+from digihealth.transforms import Transforms
 
-def get_raw_ts_X_y():
+def get_raw_ts_X_y(house_):
 
-    ts, X, y = data_loading.data_loader_rssi()
+    ts, X, y = data_loading.data_loader_rssi(house_)
     return ts, X, y
 
 
 def preprocess_X_y(ts, X, y):
+
     return X, y
 
 
@@ -142,11 +143,14 @@ def localisation_metrics(labels, timestamps):
     # TODO Number of times kitchen visited during the night //MK
 
 if __name__ == '__main__':
-    ts, X, y = get_raw_ts_X_y()
-    X, y = preprocess_X_y(ts, X, y)
-    (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
-    clf_grid = get_classifier_grid()
-    clf_grid.fit(X_train, y_train)
-    print_summary(clf_grid, X_test, y_test)
-    localisation_metrics(y_test, ts)
+    houses = ['A', 'B', 'C', 'D']
+
+    for house_ in houses:
+        ts, X, y = get_raw_ts_X_y(house_)
+        X, y = preprocess_X_y(ts, X, y)
+        (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
+        clf_grid = get_classifier_grid()
+        clf_grid.fit(X_train, y_train)
+        print_summary(clf_grid, X_test, y_test)
+        localisation_metrics(y_test, ts)
 

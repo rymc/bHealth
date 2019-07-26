@@ -108,7 +108,6 @@ def activity_metrics(labels, timestamps):
     unique_days = df_time['Time'].dt.normalize().unique()
     for day in unique_days:
             hour = day
-            print(hour)
             metric_container = {"timestamp": [], "metrics": []}
             for hr in range(23):
                 hour_container = {}

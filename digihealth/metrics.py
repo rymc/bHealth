@@ -40,7 +40,7 @@ class Metrics:
 
         sampling_frequency = self.establish_sampling_frequency(timestamps)
 
-        indexing = aggregation_duration/np.floor(sampling_frequency)
+        indexing = aggregation_duration/sampling_frequency
 
         if (indexing % 2) != 0:
             indexing = np.ceil(indexing)

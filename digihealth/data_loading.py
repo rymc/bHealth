@@ -91,14 +91,14 @@ def data_loader_accelerometer():
 
     return labels, ts, xyz
 
-def data_loader_rssi():
+def data_loader_rssi(house_):
     """
      Load example RSSI data.
      """
 
     window = 10  # in seconds
 
-    data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
+    data_directory = ('../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house_' + house_ + '/')
 
     folders = glob(data_directory)
 
@@ -202,6 +202,12 @@ def data_loader_rssi():
     X = np.array(X)
     y = np.array(y)
     y = np.squeeze(y)
+
+    sort_index = np.argsort(ts, axis=None)
+
+    y = y[sort_index]
+    ts = ts[sort_index]
+    X = X[sort_index]
 
     for idx, t in enumerate(ts):
         local = datetime.fromtimestamp(t)
