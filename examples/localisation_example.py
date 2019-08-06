@@ -139,9 +139,6 @@ def localisation_metrics(labels, timestamps):
                 hour = next_hour
 
 
-    # TODO Number of times bathroom visited during the night //MK
-    # TODO Number of times kitchen visited during the night //MK
-
 if __name__ == '__main__':
     houses = ['A', 'B', 'C', 'D']
 
