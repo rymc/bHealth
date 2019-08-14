@@ -260,3 +260,4 @@ class Metrics:
         if update:
             self.current_position += self.window_overlap
         return window
+

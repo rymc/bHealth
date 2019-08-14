@@ -3,7 +3,7 @@ sys.path.append('../')
 
 import numpy as np
 import pandas as pd
-from digihealth import data_loading
+from digihealth import data_loading_debug
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -11,10 +11,11 @@ from sklearn.model_selection import StratifiedKFold
 
 from digihealth.transforms import Transforms
 from digihealth.metrics import Metrics
+from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y():
 
-    labels, ts, xyz = data_loading.data_loader_accelerometer()
+    labels, ts, xyz = data_loading_debug.data_loader_accelerometer_debug()
     return ts, xyz, labels
 
 def preprocess_X_y(ts, X, y):
@@ -147,11 +148,35 @@ def activity_metrics(labels, timestamps):
 
     return metric_container
 
+def activity_metrics_test(labels, timestamps):
+    """Outputs typical activity metrics."""
+
+    metrics_daily = Wrapper(labels, timestamps, 'daily', 1, 25)
+    metrics_hourly = Wrapper(labels, timestamps, 'hourly', 1, 25)
+
+    df_time = timestamps.astype('datetime64')
+    df_time = pd.DataFrame(df_time, columns=['Time'])
+    df_label = pd.DataFrame(labels, columns=['Label'])
+
+    activity_table = []
+
+    metric_array_hourly = [metrics_hourly.duration_sitting,
+                            metrics_hourly.number_of_unique_activities]
+
+    metric_array_daily = [metrics_daily.duration_sitting,
+                            metrics_daily.number_of_unique_activities]
+
+    metric_container_hourly = metrics_hourly.run_metric_array(metric_array_hourly)
+    metric_container_daily = metrics_daily.run_metric_array(metric_array_daily)
+
+    return metric_container_hourly
+
 if __name__ == '__main__':
     ts, X, y = get_raw_ts_X_y()
+    activity_metrics_test(y, ts)
     X, y = preprocess_X_y(ts, X, y)
     (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
-    activity_metrics(y_test, ts)
+    activity_metrics_test(y_test, ts)
