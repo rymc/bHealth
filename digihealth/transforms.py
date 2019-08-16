@@ -28,12 +28,19 @@ class Transforms:
     @staticmethod
     def zero_crossings(x):
         """
-        Return the number of zero crossings.
+        Return the number of zero crossings. More formally:
+
+        zcr = 1/(T-1) \\Sigma^{T-1}_{t=1} 1_{R < 0} (s_{t}s_{t-1})
 
         Parameters
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        count_zc
+            Zero-crossing rate.
         """
         sign = [1,0]
         direction = 0
@@ -56,6 +63,11 @@ class Transforms:
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        Transforms.zero_crossings(x)
+            Mean-crossing rate.
         """
         x = x - np.mean(x)
         return Transforms.zero_crossings(x)
@@ -63,12 +75,19 @@ class Transforms:
     @staticmethod
     def interq(x):
         """
-        Return the interquartile range.
+        Return the interquartile range. More formally:
+
+        IQR = Q3 - Q1
 
         Parameters
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        interquartile
+            Interquartile range.
         """
         interquartile = scipy.stats.iqr(x)
         return interquartile
@@ -76,12 +95,19 @@ class Transforms:
     @staticmethod
     def skewn(x):
         """
-        Return the skewness.
+        Return the skewness. More formally:
+
+        \\gamma_{1} = E[(X-mu/sigma)^3]
 
         Parameters
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        skewness
+            Skewness of data.
         """
         skewness = scipy.stats.mstats.skew(x)
         skewness = skewness.data.flatten()[0]
@@ -90,12 +116,19 @@ class Transforms:
     @staticmethod
     def spec_energy(x):
         """
-        Return the spectral energy.
+        Return the spectral energy. More formally:
+
+        E_s = <x(t),x(t)> = \\integral{|x(t)|^2 dt}
 
         Parameters
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        sum(np.square(F))
+            Spectral Energy
         """
         f = np.fft.fft(x)
         F = abs(f)
@@ -104,12 +137,19 @@ class Transforms:
     @staticmethod
     def spec_entropy(x):
         """
-        Return the spectral entropy.
+        Return the spectral entropy. More formally:
+
+        P(m) = S(m)/(\\S(i))
 
         Parameters
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        spectral_entropy
+            Spectral entropy
         """
         f = np.fft.fft(x)
         F = abs(f)
@@ -134,6 +174,11 @@ class Transforms:
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        np.percentile(x, 25)
+            25th percentile
         """
         return np.percentile(x, 25)
 
@@ -146,18 +191,30 @@ class Transforms:
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        np.percentile(x, 75)
+            75th percentile
         """
         return np.percentile(x, 75)
 
     @staticmethod
     def kurtosis(x):
         """
-        Return the kurtosis.
+        Return the kurtosis. More formally:
+
+        Kurt[X] = E[(X-mu/sigma)^4]
 
         Parameters
         ----------
         x
             A window of data.
+
+        Returns
+        -------
+        scipy.stats.kurtosis(x, fisher=False, bias=True)
+            Kurtosis of the signal
         """
         return scipy.stats.kurtosis(x, fisher=False, bias=True)
     
@@ -173,6 +230,13 @@ class Transforms:
             Sampling frequency.
         order
             Order of the filter. Default = 5
+
+        Returns
+        -------
+        b
+            Numerator polynomial of the IIR filter.
+        a
+            Denominator polynomial of the IIR filter.
         """
         nyq = 0.5 * fs
         normal_cutoff = cutoff / nyq 
@@ -194,6 +258,11 @@ class Transforms:
             Sampling frequency.
         order
             Order of the filter. Default = 5
+
+        Returns
+        -------
+        y
+            Filtered output.
         """
         b, a = _butter_lowpass(cutoff, fs, order=order)
         y = filtfilt(b, a, x)
@@ -209,6 +278,11 @@ class Transforms:
             Window of data.
         update
             Update the current position of the window index.
+
+        Returns
+        -------
+        window
+            Windowed data.
         """
         window = x[self.current_position-self.window_length:self.current_position]
         if len(window) > 0:
@@ -232,6 +306,11 @@ class Transforms:
             Test data. Used to fit models and establish dominant features.
         method
             Method of feature selection. Method 'tree' uses random forest selection. Method 'l1' uses a linear feature selection based on L1-norm.
+
+        Returns
+        -------
+        X_new
+            A set of optimal features, selected by one of the methods.
         """
         if method == 'tree':
             clf = ExtraTreesClassifier(n_estimators=50)

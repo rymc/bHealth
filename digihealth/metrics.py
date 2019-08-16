@@ -63,6 +63,11 @@ class Metrics:
             A vector containing labels.
         timestamps
             A vector containing timestamps.
+
+        Returns
+        -------
+        label_occurrence_array
+            Tuples array, which gives the percentage of occurence of a label in a provided vector.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
@@ -89,6 +94,11 @@ class Metrics:
             A vector containing labels.
         timestamps
             A vector containing timestamps.
+
+        Returns
+        -------
+        label_time_array
+            Tuples array, which gives the percentage of time of a given label in a provided vector.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
@@ -119,6 +129,11 @@ class Metrics:
             A vector containing labels.
         timestamps
             A vector containing timestamps.
+
+        Returns
+        -------
+        label_change_array
+            A NxN array, where N is the number of states, which outlines the number of times each state transitions into another state.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
         labels_ = np.array(labels)
@@ -141,6 +156,11 @@ class Metrics:
             A vector containing labels.
         timestamps
             A vector containing timestamps.
+
+        Returns
+        -------
+        speed
+            Given the timestamps and adjecency matrix, it outputs likely rate of change of displacement of the labels.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
         labels_ = np.array(labels)
@@ -171,7 +191,12 @@ class Metrics:
         timestamps
             A vector containing timestamps.
         normalise
+            Flag to normalise the vector, such that two labels next to each other are not considered unique.
 
+        Returns
+        -------
+        average_per_label
+            Given the timestamps and corresponding label vector, returns average time between two unique labels in the array.
         """
 
         # normalise parameter attempts to remove sequential labels
@@ -221,12 +246,17 @@ class Metrics:
 
     def establish_sampling_frequency(self, timestamps):
         """
-        Return the most likely sampling frequency from the timestamps in a time window.
+        Return the most likely sampling frequency from the timestamps in a time window. Use only in case actual fs is not available.
 
         Parameters
         ----------
         timestamps
             A vector containing timestamps.
+
+        Returns
+        -------
+        sampling_frequency
+            Programmatic way of establishing most likely sampling frequency given the timestamps.
         """
         timestamps_ = np.array(timestamps)
         sampling_frequency = 0
@@ -250,6 +280,11 @@ class Metrics:
             Currently holding index of the dataset.
         update
             Update the current position of the window index.
+
+        Returns
+        -------
+        window
+            Windowed data.
         """
         window = index[self.current_position - self.window_length:self.current_position]
         if len(window) > 0:
