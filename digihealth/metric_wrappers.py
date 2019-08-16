@@ -4,11 +4,14 @@ from digihealth.metrics import Metrics
 
 class Wrapper:
 
-    def __init__(self, labels, timestamps, duration, overlap, fs=None):
+    def __init__(self, labels, timestamps, duration, overlap, fs, adjecency, label_descriptor_map):
         self.labels = labels
         self.timestamps = timestamps
         self.overlap = overlap
         self.fs = fs
+
+        self.adjecency = adjecency
+        self.label_descriptor_map = label_descriptor_map
 
         self.df_time = self.timestamps.astype('datetime64')
         self.df_time = pd.DataFrame(self.df_time, columns=['Time'])
@@ -130,8 +133,8 @@ class Wrapper:
 
     def average_walking_speed(self, labels, timestamps, timespan, overlap, fs=None):
         metr = Metrics(timestamps, timespan, overlap, fs)
-        return np.mean(metr.speed(labels, timestamps))
+        return np.mean(metr.speed(labels, timestamps, self.adjecency))
 
     def max_walking_speed(self, labels, timestamps, timespan, overlap, fs=None):
         metr = Metrics(timestamps, timespan, overlap, fs)
-        return np.max(metr.speed(labels, timestamps))
+        return np.max(metr.speed(labels, timestamps, self.adjecency))

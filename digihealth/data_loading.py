@@ -7,6 +7,7 @@ File with data loading functions.
 import numpy as np
 import pandas as pd
 import datetime
+import csv
 
 from scipy import stats
 from datetime import datetime
@@ -29,6 +30,11 @@ def data_loader_accelerometer():
     print('Found', len(folders), 'house folders.')
 
     for idx_house, fold_house in enumerate(folders):
+
+        meta_data = [fold_house + 'metadata/act_desc.dat']
+        meta_data = ''.join(meta_data)
+
+        data = pd.read_csv(meta_data, header=None)
 
         experiment_folders = glob(fold_house + 'experiments/living*/')
 
@@ -89,7 +95,7 @@ def data_loader_accelerometer():
     ts = ts[sort_index]
     xyz = xyz[sort_index]
 
-    return labels, ts, xyz
+    return labels, ts, xyz, meta_data
 
 def data_loader_rssi(house_):
     """
@@ -109,6 +115,18 @@ def data_loader_rssi(house_):
     print('Found', len(folders), 'house folders.')
 
     for idx_house, fold_house in enumerate(folders):
+
+        meta_data_cord = [fold_house + 'metadata/tag_coordinates.dat']
+        meta_data_cord = ''.join(meta_data_cord)
+        data_coords = pd.read_csv(meta_data_cord, header=None)
+
+        meta_data_adj = [fold_house + 'metadata/tag_adjacency.dat']
+        meta_data_adj = ''.join(meta_data_adj)
+
+        # with open(meta_data_adj) as f:
+        #     reader = csv.reader(f)
+        #     for row in reader:
+        #         break
 
         experiment_folders = glob(fold_house + 'experiments/living*/')
 
@@ -212,5 +230,7 @@ def data_loader_rssi(house_):
     for idx, t in enumerate(ts):
         local = datetime.fromtimestamp(t)
         ts[idx] = local.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+
+
 
     return ts, X, y

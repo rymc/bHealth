@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 
 from digihealth.metrics import Metrics
 from digihealth.transforms import Transforms
+from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y(house_):
 
@@ -88,56 +89,27 @@ def print_summary(clf_grid, X_test, y_test):
     print("Train / test split accuracy "+str(tt_score))
 
 def localisation_metrics(labels, timestamps):
-    """Outputs typical localisation metrics."""
+    """Outputs typical activity metrics."""
+
+    metrics_daily = Wrapper(labels, timestamps, 'daily', 1, 25, adjecency=None, label_descriptor_map=None)
+    metrics_hourly = Wrapper(labels, timestamps, 'hourly', 1, 25, adjecency=None, label_descriptor_map=None)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
     df_label = pd.DataFrame(labels, columns=['Label'])
 
-    unique_days = df_time['Time'].dt.normalize().unique()
-    for day in unique_days:
-        next_day = day + np.timedelta64(1,'D')
-        mask = ((df_time['Time'] > day) & (df_time['Time'] <= next_day))
-        times = df_time.loc[mask]
-        labs = df_label.loc[mask]
+    activity_table = []
 
-        if labs.size > 1:
+    metric_array_hourly = [metrics_hourly.duration_sitting,
+                           metrics_hourly.number_of_unique_activities]
 
-            #For now, I cast it into posix time to make the metrics easier to analyse. This is because
-            #they assume that the timestamp is in seconds // MK
+    metric_array_daily = [metrics_daily.duration_sitting,
+                          metrics_daily.number_of_unique_activities]
 
-            times = times.astype(np.int64) // 10**6
-            times = times / 1000
+    metric_container_hourly = metrics_hourly.run_metric_array(metric_array_hourly)
+    metric_container_daily = metrics_daily.run_metric_array(metric_array_daily)
 
-            metr = Metrics(times, 86400, 1, 25)
-            daily_average_label_occurence = metr.average_labels_per_window(labs, times)
-            daily_average_location_stay = metr.duration_of_labels_per_window(labs, times)
-            daily_average_number_of_changes= metr.number_of_label_changes_per_window(labs, times)
-            daily_average_time_between_labels= metr.average_time_between_labels(labs, times)
-
-            hour = day
-            for hr in range(23):
-                next_hour = hour + np.timedelta64(1, 'h')
-                mask = ((df_time['Time'] > hour) & (df_time['Time'] <= next_hour))
-                times = df_time.loc[mask]
-                labs = df_label.loc[mask]
-
-                if labs.size > 1:
-
-                    # For now, I cast it into posix time to make the metrics easier to analyse. This is because
-                    # they assume that the timestamp is in seconds // MK
-
-                    times = times.astype(np.int64) // 10 ** 6
-                    times = times / 1000
-
-                    metr = Metrics(times, 3600, 1, 25)
-                    hourly_average_label_occurence = metr.average_labels_per_window(labs, times)
-                    hourly_average_location_stay = metr.duration_of_labels_per_window(labs, times)
-                    hourly_average_number_of_changes = metr.number_of_label_changes_per_window(labs, times)
-                    hourly_average_time_between_labels = metr.average_time_between_labels(labs, times)
-
-                hour = next_hour
-
+    return metric_container_hourly, metric_container_daily
 
 if __name__ == '__main__':
     houses = ['A', 'B', 'C', 'D']

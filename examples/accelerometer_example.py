@@ -3,7 +3,7 @@ sys.path.append('../')
 
 import numpy as np
 import pandas as pd
-from digihealth import data_loading_debug
+from digihealth import data_loading
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -15,7 +15,7 @@ from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y():
 
-    labels, ts, xyz = data_loading_debug.data_loader_accelerometer_debug()
+    labels, ts, xyz = data_loading.data_loader_accelerometer()
     return ts, xyz, labels
 
 def preprocess_X_y(ts, X, y):
@@ -102,55 +102,6 @@ def print_summary(clf_grid, X_test, y_test):
 def activity_metrics(labels, timestamps):
     """Outputs typical activity metrics."""
 
-    df_time = timestamps.astype('datetime64')
-    df_time = pd.DataFrame(df_time, columns=['Time'])
-    df_label = pd.DataFrame(labels, columns=['Label'])
-
-    unique_days = df_time['Time'].dt.normalize().unique()
-    for day in unique_days:
-            hour = day
-            metric_container = {"timestamp": [], "metrics": []}
-            for hr in range(23):
-                hour_container = {}
-                next_hour = hour + np.timedelta64(1, 'h')
-                mask = ((df_time['Time'] > hour) & (df_time['Time'] <= next_hour))
-                times = df_time.loc[mask]
-                labs = df_label.loc[mask]
-
-                if labs.size > 1:
-
-                    times = times.astype(np.int64) // 10 ** 6
-                    times = times / 1000
-
-                    metr = Metrics(times, 3600, 1, 25)
-
-                    hourly_average_label_occurrence = metr.average_labels_per_window(labs, times)
-                    hourly_average_location_stay = metr.duration_of_labels_per_window(labs, times)
-                    hourly_average_number_of_changes = metr.number_of_label_changes_per_window(labs, times)
-                    hourly_average_time_between_labels = metr.average_time_between_labels(labs, times)
-
-                else:
-
-                    hourly_average_label_occurrence = []
-                    hourly_average_location_stay = []
-                    hourly_average_number_of_changes =[]
-                    hourly_average_time_between_labels = []
-
-                hour_container["label_occurrence"] = hourly_average_label_occurrence
-                hour_container["label_stay"] = hourly_average_location_stay
-                hour_container["average_number_of_changes"] = hourly_average_number_of_changes
-                hour_container["average_time_between_labels"] = hourly_average_time_between_labels
-
-                metric_container["timestamp"].append(hour)
-                metric_container["metrics"].append(hour_container)
-
-                hour = next_hour
-
-    return metric_container
-
-def activity_metrics_test(labels, timestamps):
-    """Outputs typical activity metrics."""
-
     metrics_daily = Wrapper(labels, timestamps, 'daily', 1, 25)
     metrics_hourly = Wrapper(labels, timestamps, 'hourly', 1, 25)
 
@@ -169,14 +120,13 @@ def activity_metrics_test(labels, timestamps):
     metric_container_hourly = metrics_hourly.run_metric_array(metric_array_hourly)
     metric_container_daily = metrics_daily.run_metric_array(metric_array_daily)
 
-    return metric_container_hourly
+    return metric_container_hourly, metric_container_daily
 
 if __name__ == '__main__':
     ts, X, y = get_raw_ts_X_y()
-    activity_metrics_test(y, ts)
     X, y = preprocess_X_y(ts, X, y)
     (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
-    activity_metrics_test(y_test, ts)
+    activity_metrics(y_test, ts)
