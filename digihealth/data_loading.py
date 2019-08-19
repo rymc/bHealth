@@ -95,7 +95,7 @@ def data_loader_accelerometer():
     ts = ts[sort_index]
     xyz = xyz[sort_index]
 
-    return labels, ts, xyz, meta_data
+    return labels, ts, xyz
 
 def data_loader_rssi(house_):
     """
