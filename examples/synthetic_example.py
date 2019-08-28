@@ -14,6 +14,9 @@ import numpy.ma as ma
 
 from datetime import datetime, timedelta
 
+from digihealth.visualisations import plot_metrics
+from digihealth.visualisations import features_figure
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -25,7 +28,7 @@ from sklearn.model_selection import StratifiedKFold
 
 from digihealth.synthetic import RandomTimeSeries
 #from synthetic import RandomTimeSeries
-
+from digihealth.metric_wrappers import Wrapper
 
 np.random.seed(42)
 
@@ -46,14 +49,18 @@ def get_raw_ts_X_y():
                       lambda: sin_gaussian_rand(np.random.randint(30, 90), 3)*2
                                 + [0, 0, -1],
                       lambda: np.random.randn(np.random.randint(5*60, 10*60), 3)/16
-                                + [-0.5, 0.5, 0]
+                                + [-0.5, 0.5, 0],
+                      lambda: np.random.randn(np.random.randint(5 * 60, 10 * 60), 3) / 16
+                              + [-0.5, 0.5, 0]
                      ]
 
-    labels = ['stand', 'sit', 'walk', 'run', 'sleep']
+    labels = [0, 1, 2, 3, 4, 5]
     rts = RandomTimeSeries(generator_list, labels=labels,
-                           priors=[3, 4, 2, 1, 1], samplesize='1Min')
+                           priors=[3, 4, 2, 1, 1, 1], samplesize='1Min')
 
-    ts, X, y = rts.generate('06/02/2019', '27/02/2019')
+    ts, X, y = rts.generate('06/02/2019', '13/02/2019')
+
+    ts = ts.values
 
     return ts, X, y, labels, features
 
@@ -164,13 +171,48 @@ def generate_visualisations(clf, X, y, ts, labels, features):
                                   title="{} per box".format(resample), m=None)
     fig.savefig(filename, dpi=300)
 
+def activity_metrics(labels, timestamps, span):
+    """Outputs typical activity metrics."""
+
+    descriptor_map = {
+        'eating': 0,
+        'sitting': 1,
+        'walking': 2,
+        'studying': 3,
+        'sleeping': 4,
+        'washing': 5
+    }
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency=None)
+
+    df_time = timestamps.astype('datetime64')
+    df_time = pd.DataFrame(df_time, columns=['Time'])
+    df_label = pd.DataFrame(labels, columns=['Label'])
+
+    metric_array = [metrics.duration_sitting,
+                    metrics.duration_walking,
+                    metrics.duration_washing,
+                    metrics.duration_eating,
+                    metrics.duration_sleeping,
+                    metrics.duration_studying,
+                    metrics.number_of_unique_activities]
+
+    metric_container, date_container = metrics.run_metric_array(metric_array)
+
+    return metric_container, date_container
 
 if __name__ == '__main__':
     ts, X, y, labels, features = get_raw_ts_X_y()
+
+    features_figure(X[0:X.size:50], ts[0:ts.size:50], feature_names=['X', 'Y', 'Z'])
+
     ts, X, y = preprocess_X_y(ts, X, y)
     (ts_train, X_train, y_train), (ts_test, X_test, y_test) = split_train_test(ts, X, y)
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
-    generate_visualisations(clf_grid, X, y, ts=ts, labels=labels,
-                            features=features)
+
+    metric_container_daily, date_container_daily = activity_metrics(y, ts, 'daily')
+    plot_metrics(metric_container_daily, date_container_daily)
+
+    plt.show()
