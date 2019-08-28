@@ -3,7 +3,11 @@ sys.path.append('../')
 
 import numpy as np
 import pandas as pd
-from digihealth import data_loading
+import matplotlib.pyplot as plt
+from digihealth.visualisations import plot_metrics
+from digihealth.visualisations import features_figure
+from digihealth.visualisations import plot_features
+from digihealth import data_loading_debug
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -15,7 +19,7 @@ from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y():
 
-    labels, ts, xyz = data_loading.data_loader_accelerometer()
+    labels, ts, xyz = data_loading_debug.data_loader_accelerometer_debug()
     return ts, xyz, labels
 
 def preprocess_X_y(ts, X, y):
@@ -83,8 +87,8 @@ def get_classifier_grid():
     # This should select the best set of parameters
     cv = StratifiedKFold(n_splits=5, shuffle=False)
     clf = RandomForestClassifier()
-    param_grid = {'n_estimators' : [200, 250, 300],
-                  'min_samples_leaf': [5, 10, 20, 40]}
+    param_grid = {'n_estimators' : [200, 250],
+                  'min_samples_leaf': [5, 10]}
     clf_grid = GridSearchCV(clf, param_grid=param_grid, cv=cv, refit=True)
     return clf_grid
 
@@ -99,34 +103,50 @@ def print_summary(clf_grid, X_test, y_test):
     print("Train / test split accuracy "+str(tt_score))
 
 
-def activity_metrics(labels, timestamps):
+def activity_metrics(labels, timestamps, span):
     """Outputs typical activity metrics."""
 
-    metrics_daily = Wrapper(labels, timestamps, 'daily', 1, 25)
-    metrics_hourly = Wrapper(labels, timestamps, 'hourly', 1, 25)
+    descriptor_map = {
+                'sitting' : 77,
+                'walking' : 78,
+                'washing' : 79,
+                'eating'  : 80,
+                'sleeping': 81,
+                'studying': 82
+            }
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency=None)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
     df_label = pd.DataFrame(labels, columns=['Label'])
 
-    activity_table = []
+    metric_array= [metrics.duration_sitting,
+                   metrics.duration_walking,
+                   metrics.duration_washing,
+                   metrics.duration_eating,
+                   metrics.duration_sleeping,
+                   metrics.duration_studying,
+                   metrics.number_of_unique_activities]
 
-    metric_array_hourly = [metrics_hourly.duration_sitting,
-                            metrics_hourly.number_of_unique_activities]
+    metric_container, date_container = metrics.run_metric_array(metric_array)
 
-    metric_array_daily = [metrics_daily.duration_sitting,
-                            metrics_daily.number_of_unique_activities]
-
-    metric_container_hourly = metrics_hourly.run_metric_array(metric_array_hourly)
-    metric_container_daily = metrics_daily.run_metric_array(metric_array_daily)
-
-    return metric_container_hourly, metric_container_daily
+    return metric_container, date_container
 
 if __name__ == '__main__':
     ts, X, y = get_raw_ts_X_y()
+    features_figure(X[0:X.size:50], feature_names=['X', 'Y', 'Z'])
+
     X, y = preprocess_X_y(ts, X, y)
     (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
-    activity_metrics(y_test, ts)
+
+    metric_container_hourly, date_container_hourly = activity_metrics(y_test, ts, 'hourly')
+    plot_metrics(metric_container_hourly, date_container_hourly)
+
+    metric_container_daily, date_container_daily = activity_metrics(y_test, ts, 'daily')
+    plot_metrics(metric_container_daily, date_container_daily)
+
+    plt.show()

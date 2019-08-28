@@ -1,17 +1,201 @@
-import numpy
 
+import numpy as np
+import seaborn as sn
+import pandas as pd
 import matplotlib as mpl
-mpl.use('Agg')
-mpl.rcParams['savefig.format'] = 'svg'
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from matplotlib.lines import Line2D
 import matplotlib.patches as mpatches
+from matplotlib.dates import DateFormatter
 
-import datetime
 
-import pandas as pd
+def plot_test_train_splits(train, test):
 
+    unique_labels_train, counts_train = np.unique(train, return_counts=True)
+    unique_labels_test, counts_test = np.unique(test, return_counts=True)
+
+    x = np.arange(len(unique_labels_train))  # the label locations
+    width = 0.35
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width / 2, counts_train, width, label='Train')
+    rects2 = ax.bar(x + width / 2, counts_test, width, label='Test')
+
+    ax.set_ylabel('Instances per set')
+    ax.set_title('Stratification of train/test per label set')
+    ax.set_xticks(x)
+    ax.legend()
+
+
+def check_metrics(metric, string):
+
+    return string in metric
+
+def plot_metrics(metrics, date):
+
+    for id, date_ in enumerate(date):
+
+        props = []
+        labs = []
+
+        for metric in metrics:
+
+            if check_metrics(metric, 'duration'):
+
+                per_metric_container = metrics[metric]
+
+                current_metrics_per_date = per_metric_container[id]
+
+                for idx, proportion in enumerate(current_metrics_per_date):
+                    for key in proportion:
+                        if proportion[key] != 0.0:
+                            props.append(proportion[key])
+                            #labs.append((str(key) + ' ' + str("%.2f" % proportion[key])))
+                            labs.append(str(key))
+
+        if len(props) != 0:
+            x = np.arange(len(props))
+            plt.figure()
+            plt.bar(x, np.squeeze(props))
+            plt.xticks(x, labs)
+            plt.ylabel('Time (s)')
+            plt.xlabel('Metric')
+            plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+                       fontsize=9, framealpha=0.7)
+            plt.title('durations_of_activities' + ' ' + str(date_))
+
+        props = []
+        labs = []
+
+        for metric in metrics:
+
+            if check_metrics(metric, 'activities'):
+
+                per_metric_container = metrics[metric]
+
+                current_metrics_per_date = per_metric_container[id]
+
+                for idx, proportion in enumerate(current_metrics_per_date):
+                    for key in proportion:
+                        if proportion[key] != 0.0:
+                            props.append(proportion[key])
+                            labs.append(str(key))
+
+                if len(props) != 0:
+                    plt.figure()
+                    plt.pie(np.squeeze(props), labels=labs, autopct='%1.0f%%')
+                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+                               fontsize=9, framealpha=0.7)
+                    plt.title(metric + ' ' + str(date_))
+
+        for metric in metrics:
+
+            if check_metrics(metric, 'locations'):
+
+                per_metric_container = metrics[metric]
+
+                current_metrics_per_date = per_metric_container[id]
+
+                for idx, proportion in enumerate(current_metrics_per_date):
+                    for key in proportion:
+                        if proportion[key] != 0.0:
+                            props.append(proportion[key])
+                            labs.append(str(key))
+
+                if len(props) != 0:
+                    plt.figure()
+                    plt.pie(np.squeeze(props), labels=labs, autopct='%1.0f%%')
+                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+                               fontsize=9, framealpha=0.7)
+                    plt.title(metric + ' ' + str(date_))
+
+        for metric in metrics:
+
+            if check_metrics(metric, 'transfers'):
+
+                per_metric_container = metrics[metric]
+
+                current_metrics_per_date = per_metric_container[id]
+
+                xlabs = ['foyer', 'bedroom', 'living_room', 'bathroom']
+                ylabs = ['foyer', 'bedroom', 'living_room', 'bathroom']
+
+                if len(current_metrics_per_date) != 0:
+                    data_frame_ =  pd.DataFrame(np.squeeze(current_metrics_per_date))
+                    plt.figure()
+                    sn.heatmap(data_frame_, annot=True, xticklabels=xlabs, yticklabels=ylabs)
+                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+                               fontsize=9, framealpha=0.7)
+                    plt.title(metric + ' ' + str(date_))
+
+        for metric in metrics:
+
+            if check_metrics(metric, 'speed'):
+
+                per_metric_container = metrics[metric]
+
+                speed_list = np.squeeze(per_metric_container[0][0])
+                average_speed = np.squeeze(per_metric_container[0][1])
+                max_speed = np.squeeze(per_metric_container[0][2])
+
+                if len(props) != 0:
+                    x = np.arange(len(speed_list))
+                    average_speed = len(x) * [average_speed]
+                    plt.figure()
+                    plt.plot(speed_list)
+                    plt.plot(x, average_speed)
+                    plt.xlabel('Sample')
+                    plt.ylabel(r'Velocity $ms^{-1}$')
+                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+                               fontsize=9, framealpha=0.7)
+                    plt.title('velocity_from_labels' + ' ' + str(date_))
+
+        # for metric in metrics:
+        #
+        #     if check_metrics(metric, 'visit'):
+        #
+        #         per_metric_container = metrics[metric]
+        #
+        #         current_metrics_per_date = per_metric_container[id]
+        #
+        #         for idx, proportion in enumerate(current_metrics_per_date):
+        #             for key in proportion:
+        #                 if proportion[key] != 0.0:
+        #                     props.append(proportion[key])
+        #                     labs.append(str(key))
+        #
+        # if len(props) != 0:
+        #     x = np.arange(len(props))
+        #     plt.figure()
+        #     plt.bar(x, np.squeeze(props))
+        #     plt.xticks(x, labs)
+        #     plt.ylabel('Time (s)')
+        #     plt.xlabel('Metric')
+        #     plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+        #                fontsize=9, framealpha=0.7)
+        #     plt.title('specific_' + ' ' + str(date_))
+
+def plot_features(X, ts=None, feature_names=None, xlab=None, ylab=None):
+
+    number_of_instances = X.shape[0]
+    number_of_features = X.shape[1]
+
+    if ts is None:
+        ts = np.arange(number_of_instances)
+
+    if feature_names is None:
+        feature_names = np.arange(number_of_features)
+
+    for feature_id, feature in enumerate(feature_names):
+        plt.subplot(number_of_features, 1, feature_id+1)
+        plt.plot(ts, X[:, feature_id], linewidth=0.5, markersize=12, label=feature)
+        plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+                   fontsize=9, framealpha=0.7)
+        if ylab is not None:
+            plt.ylabel(ylab)
+
+    if xlab is not None:
+        plt.xlabel(xlab)
 
 def features_figure(X, ts=None, feature_names=None, fig=None, ax=None,
                     figsize=None):
@@ -53,10 +237,10 @@ def features_figure(X, ts=None, feature_names=None, fig=None, ax=None,
     Examples
     --------
 
-    >>> X = np.array([[25, 70], [26, 60], [23, 65], [25, 70], [23, 77]])
-    >>> ts = np.datetime64(0, 's') + np.arange(len(X))
-    >>> feature_names = ['temperature', 'humidity']
-    >>> features_figure(X, ts, feature_names)
+    # >>> X = np.array([[25, 70], [26, 60], [23, 65], [25, 70], [23, 77]])
+    # >>> ts = np.datetime64(0, 's') + np.arange(len(X))
+    # >>> feature_names = ['temperature', 'humidity']
+    # >>> features_figure(X, ts, feature_names)
     (<Figure size 640x480 with 1 Axes>,
      <matplotlib.axes._subplots.AxesSubplot at 0x7f8d8086f400>)
     """
@@ -66,24 +250,103 @@ def features_figure(X, ts=None, feature_names=None, fig=None, ax=None,
         ax = fig.add_subplot(111)
 
     if ts is None:
-        ts = numpy.arange(X.shape[0])
+        ts = np.arange(X.shape[0]) + 1
 
     if feature_names is None:
         feature_names = np.arange(X.shape[1])
 
     for i, feature in enumerate(feature_names):
         ax.plot(ts, X[:, i], label=feature)
-    plt.gcf().autofmt_xdate()
+
+    #plt.gcf().autofmt_xdate()
     ax.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
               fontsize=9, framealpha=0.7)
-    xfmt = mpl.dates.DateFormatter('%H:%M\n%d/%m')
-    ax.xaxis.set_major_formatter(xfmt)
+
+    plt.title('raw_features')
+
     ax.set_ylim(X.min(), X.max() + X.std(axis=0).max())
     ax.set_xlim(ts[0], ts[-1])
     plt.gcf().autofmt_xdate()
     ax.grid(b=True)
     ax.set_axisbelow(True)
-    fig.tight_layout()
+    fig.show()
+
+    return fig, ax
+
+def features_figure_scatter(X, ts=None, feature_names=None, fig=None, ax=None,
+                    figsize=None):
+    """
+    Returns figure with lines for every feature in the y axis and time in the x axis.
+
+    Parameters
+    ----------
+    X : (N, D) ndarray
+        Matrix with N samples and D feature values.
+
+    ts : (N, ) ndarray of datetime, optional
+        One-dimensional array with the datetime of every sample. If None
+        assigns numbers from 0 to N.
+
+    feature_names : (D, ) array_like, optional
+        List of names corresponding to each feature. It assumes that the order
+        corresponds to the columns of matrix X. If None the names are integers
+        from 0 to D.
+
+    fig : matplotlib.figure.Figure, optional
+        Matplotlib figure where to create the axes for the plot, if None a new
+        figure is created.
+
+    ax : matplotlib.axes.Axes, optional
+        Maptlotlib Axes where to create the plot, if None a new axes is
+        created.
+
+    figsize : (float, float), optional
+        width, height in inches. If not provided default from matplotlib.
+
+    Returns
+    -------
+    fig : matplotlib figure
+
+    ax  : matplotlib axis
+
+
+    Examples
+    --------
+
+    # >>> X = np.array([[25, 70], [26, 60], [23, 65], [25, 70], [23, 77]])
+    # >>> ts = np.datetime64(0, 's') + np.arange(len(X))
+    # >>> feature_names = ['temperature', 'humidity']
+    # >>> features_figure(X, ts, feature_names)
+    (<Figure size 640x480 with 1 Axes>,
+     <matplotlib.axes._subplots.AxesSubplot at 0x7f8d8086f400>)
+    """
+    if fig is None:
+        fig = plt.figure(figsize=figsize)
+    if ax is None:
+        ax = fig.add_subplot(111)
+
+    if ts is None:
+        ts = np.arange(X.shape[0]) + 1
+
+    if feature_names is None:
+        feature_names = np.arange(X.shape[1])
+
+    for i, feature in enumerate(feature_names):
+        ax.scatter(ts, X[:, i], label=feature, s=3)
+
+    #plt.gcf().autofmt_xdate()
+    ax.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+              fontsize=9, framealpha=0.7)
+
+    plt.title('raw_features')
+
+    ax.set_ylim(X.min(), X.max() + X.std(axis=0).max())
+    ax.set_xlim(ts[0], ts[-1])
+    plt.gcf().autofmt_xdate()
+    ax.grid(b=True)
+    ax.set_axisbelow(True)
+    fig.show()
+
     return fig, ax
 
 

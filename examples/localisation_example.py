@@ -3,7 +3,12 @@ sys.path.append('../')
 
 import pandas as pd
 import numpy as np
-from digihealth import data_loading
+from digihealth import data_loading_debug
+
+from digihealth.visualisations import plot_metrics
+from digihealth.visualisations import features_figure
+from digihealth.visualisations import features_figure_scatter
+from digihealth.visualisations import plot_test_train_splits
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -22,7 +27,7 @@ from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y(house_):
 
-    ts, X, y = data_loading.data_loader_rssi(house_)
+    ts, X, y = data_loading_debug.data_loader_rssi_debug(house_)
     return ts, X, y
 
 
@@ -38,6 +43,7 @@ def split_train_test(X, y):
     train_index, test_index = skf.split(X, y).__next__()
     X_train, X_test = X[train_index], X[test_index]
     y_train, y_test = y[train_index], y[test_index]
+    plot_test_train_splits(y_train, y_test)
     return (X_train, y_train), (X_test, y_test)
 
 
@@ -88,38 +94,51 @@ def print_summary(clf_grid, X_test, y_test):
     tt_score = clf_grid.score(X_test, y_test)
     print("Train / test split accuracy "+str(tt_score))
 
-def localisation_metrics(labels, timestamps):
+def localisation_metrics(labels, timestamps, span):
     """Outputs typical activity metrics."""
 
-    metrics_daily = Wrapper(labels, timestamps, 'daily', 1, 25, adjecency=None, label_descriptor_map=None)
-    metrics_hourly = Wrapper(labels, timestamps, 'hourly', 1, 25, adjecency=None, label_descriptor_map=None)
+    descriptor_map = {
+        'foyer' : [0],
+        'bedroom' : [1],
+        'living_room' : [2],
+        'bathroom' : [3]
+    }
+
+    adjecency = [[0, 2.5, 3, 3.3],
+                 [2.5, 0, 6, 1.5],
+                 [3, 6, 0, 4],
+                 [3.3, 1.5, 4, 0]]
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
     df_label = pd.DataFrame(labels, columns=['Label'])
 
-    activity_table = []
+    metric_array= [ metrics.walking_speed,
+                    metrics.room_transfers,
+                    metrics.number_of_unique_locations]
 
-    metric_array_hourly = [metrics_hourly.duration_sitting,
-                           metrics_hourly.number_of_unique_activities]
+    metric_container, date_container = metrics.run_metric_array(metric_array)
 
-    metric_array_daily = [metrics_daily.duration_sitting,
-                          metrics_daily.number_of_unique_activities]
-
-    metric_container_hourly = metrics_hourly.run_metric_array(metric_array_hourly)
-    metric_container_daily = metrics_daily.run_metric_array(metric_array_daily)
-
-    return metric_container_hourly, metric_container_daily
+    return metric_container, date_container
 
 if __name__ == '__main__':
-    houses = ['A', 'B', 'C', 'D']
+    houses = ['A']
 
     for house_ in houses:
+
         ts, X, y = get_raw_ts_X_y(house_)
+        features_figure(X, feature_names=['AP1', 'AP2', 'AP3', 'AP4', 'AP5', 'AP6', 'AP7', 'AP8'])
+
         X, y = preprocess_X_y(ts, X, y)
         (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
         clf_grid = get_classifier_grid()
         clf_grid.fit(X_train, y_train)
         print_summary(clf_grid, X_test, y_test)
-        localisation_metrics(y_test, ts)
+
+        metric_container_daily, date_container_daily = localisation_metrics(y_test, ts, 'daily')
+        plot_metrics(metric_container_daily, date_container_daily)
+
+        plt.show()
 

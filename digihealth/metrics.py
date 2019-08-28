@@ -113,6 +113,9 @@ class Metrics:
 
             prop = count / number_of_instances
             time_prop = prop * total_time_in_window
+
+            # label_time_array.update({lab : float(time_prop)})
+
             label_time_array[idx, 0] = int(lab)
             label_time_array[idx, 1] = time_prop
 
@@ -175,9 +178,8 @@ class Metrics:
             label_time_array[idx] += timestamps[idx - 1] - timestamps[idx]
 
         distances = np.divide(label_change_array, label_time_array)
-        speed = np.abs(np.nanmean(distances))
 
-        return speed
+        return distances
 
     @staticmethod
     def average_time_between_labels(labels, timestamps, normalise=True):
