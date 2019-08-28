@@ -137,7 +137,7 @@ if __name__ == '__main__':
         clf_grid.fit(X_train, y_train)
         print_summary(clf_grid, X_test, y_test)
 
-        metric_container_daily, date_container_daily = localisation_metrics(y_test, ts, 'daily')
+        metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'daily')
         plot_metrics(metric_container_daily, date_container_daily)
 
         plt.show()

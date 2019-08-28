@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from digihealth.visualisations import plot_metrics
 from digihealth.visualisations import features_figure
 from digihealth.visualisations import plot_features
+from digihealth.visualisations import plot_test_train_splits
 from digihealth import data_loading_debug
 
 from sklearn.ensemble import RandomForestClassifier
@@ -79,6 +80,7 @@ def split_train_test(X, y):
     train_index, test_index = skf.split(X, y).__next__()
     X_train, X_test = X[train_index], X[test_index]
     y_train, y_test = y[train_index], y[test_index]
+    plot_test_train_splits(y_train, y_test)
     return (X_train, y_train), (X_test, y_test)
 
 
@@ -143,10 +145,7 @@ if __name__ == '__main__':
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
 
-    metric_container_hourly, date_container_hourly = activity_metrics(y_test, ts, 'hourly')
-    plot_metrics(metric_container_hourly, date_container_hourly)
-
-    metric_container_daily, date_container_daily = activity_metrics(y_test, ts, 'daily')
+    metric_container_daily, date_container_daily = activity_metrics(y, ts, 'daily')
     plot_metrics(metric_container_daily, date_container_daily)
 
     plt.show()

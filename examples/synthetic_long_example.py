@@ -55,7 +55,7 @@ def get_raw_ts_X_y():
     rts = RandomTimeSeries(generator_list, labels=labels,
                            priors=[5, 2, 4, 3, 1], samplesize='1Min')
 
-    ts, X, y = rts.generate('01-01-2019', '07-01-2019')
+    ts, X, y = rts.generate('01-01-2019', '02-01-2019')
 
     ts = ts.values
 
@@ -202,7 +202,7 @@ if __name__ == '__main__':
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
 
-    metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'daily')
+    metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'hourly')
     plot_metrics(metric_container_daily, date_container_daily)
 
     plt.show()
