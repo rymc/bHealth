@@ -13,7 +13,8 @@ import matplotlib as mpl
 import numpy.ma as ma
 
 from datetime import datetime, timedelta
-
+from digihealth.visualisations import plot_metrics
+from digihealth.visualisations import features_figure
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -24,6 +25,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import StratifiedKFold
 
 from digihealth.synthetic import RandomTimeSeries
+from digihealth.metric_wrappers import Wrapper
 
 
 np.random.seed(42)
@@ -49,11 +51,14 @@ def get_raw_ts_X_y():
                 + [0, 1, 1, 0, 2, 3, 9],
                 ]
 
-    labels = ['bathroom', 'bedroom 1', 'bedroom 2', 'kitchen', 'living room']
+    labels = [0, 1, 2, 3, 4]
     rts = RandomTimeSeries(generator_list, labels=labels,
-                           priors=[5, 2, 4, 3, 3], samplesize='10Min')
+                           priors=[5, 2, 4, 3, 1], samplesize='1Min')
 
-    ts, X, y = rts.generate('01-01-2019', '05-04-2019')
+    ts, X, y = rts.generate('01-01-2019', '07-01-2019')
+
+    ts = ts.values
+
     return ts, X, y, labels, features
 
 
@@ -153,13 +158,52 @@ def generate_visualisations(clf, X, y, ts, labels, features):
                                   title="{} per box".format(resample), m=None)
     fig.savefig(filename, dpi=300)
 
+def localisation_metrics(labels, timestamps, span):
+    """Outputs typical activity metrics."""
+
+    descriptor_map = {
+        'bathroom' : [0],
+        'bedroom 1' : [1],
+        'bedroom 2' : [2],
+        'kitchen' : [3],
+        'living room' : [4]
+    }
+
+    adjecency = [[0, 2.5, 3, 3.3, 4],
+                 [2.5, 0, 6, 1.5, 2],
+                 [3, 6, 0, 4, 1],
+                 [3.3, 1.5, 4, 0, 1],
+                 [4, 3, 1, 1, 0]]
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency)
+
+    df_time = timestamps.astype('datetime64')
+    df_time = pd.DataFrame(df_time, columns=['Time'])
+    df_label = pd.DataFrame(labels, columns=['Label'])
+
+    metric_array= [ metrics.walking_speed,
+                    metrics.room_transfers,
+                    metrics.number_of_unique_locations]
+
+    metric_container, date_container = metrics.run_metric_array(metric_array)
+
+    return metric_container, date_container
+
 
 if __name__ == '__main__':
     ts, X, y, labels, features = get_raw_ts_X_y()
+
+    features_figure(X, ts, feature_names=['rssi bathroom', 'rssi bedroom 1', 'rssi stairs', 'rssi hall',
+                'rssi kitchen', 'rssi living room'])
+
     ts, X, y = preprocess_X_y(ts, X, y)
     (ts_train, X_train, y_train), (ts_test, X_test, y_test) = split_train_test(ts, X, y)
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
-    generate_visualisations(clf_grid, X, y, ts=ts, labels=labels,
-                            features=features)
+
+    metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'daily')
+    plot_metrics(metric_container_daily, date_container_daily)
+
+    plt.show()
+
