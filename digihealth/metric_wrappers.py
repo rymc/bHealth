@@ -1,8 +1,20 @@
+"""
+metric_wrappers.py
+====================================
+The main class containing human-readable wrappers for metrics.
+"""
+
 import numpy as np
 import pandas as pd
 from digihealth.metrics import Metrics
 
 class Wrapper:
+    """
+    Wrapper class is instantiated before calling the metrics. The metrics are contained in an array, which is subsequently
+    iterated. The outcomes of the iterations are then held inside containers.
+
+    If you want to add your own specific metric function, do it here.
+    """
 
     def __init__(self, labels, timestamps, duration, overlap, fs, label_descriptor_map, adjecency=None):
         """
