@@ -31,12 +31,15 @@ def check_metrics(metric, string):
 
     return string in metric
 
-def plot_metrics(metrics, date):
+def plot_metrics(metrics, date, labels_=None):
 
     for id, date_ in enumerate(date):
 
         props = []
         labs = []
+        speed_list = []
+        average_speed = []
+        max_speed = []
 
         for metric in metrics:
 
@@ -117,8 +120,8 @@ def plot_metrics(metrics, date):
 
                 current_metrics_per_date = per_metric_container[id]
 
-                xlabs = ['foyer', 'bedroom', 'living_room', 'bathroom']
-                ylabs = ['foyer', 'bedroom', 'living_room', 'bathroom']
+                xlabs = labels_
+                ylabs = labels_
 
                 if len(current_metrics_per_date) != 0:
                     data_frame_ =  pd.DataFrame(np.squeeze(current_metrics_per_date))
@@ -134,11 +137,11 @@ def plot_metrics(metrics, date):
 
                 per_metric_container = metrics[metric]
 
-                speed_list = np.squeeze(per_metric_container[0][0])
-                average_speed = np.squeeze(per_metric_container[0][1])
-                max_speed = np.squeeze(per_metric_container[0][2])
+                speed_list = np.squeeze(per_metric_container[id][0])
+                average_speed = np.squeeze(per_metric_container[id][1])
+                max_speed = np.squeeze(per_metric_container[id][2])
 
-                if len(props) != 0:
+                if len(speed_list) != 0:
                     x = np.arange(len(speed_list))
                     average_speed = len(x) * [average_speed]
                     plt.figure()

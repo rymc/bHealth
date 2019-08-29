@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 
 from digihealth.visualisations import plot_metrics
 from digihealth.visualisations import features_figure
+from digihealth.visualisations import plot_test_train_splits
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -76,6 +77,7 @@ def split_train_test(ts, X, y):
     train_index, test_index = skf.split(X, y).__next__()
     train = ts[train_index], X[train_index], y[train_index]
     test = ts[test_index], X[test_index], y[test_index]
+    plot_test_train_splits(y[train_index], y[test_index])
     return train, test
 
 

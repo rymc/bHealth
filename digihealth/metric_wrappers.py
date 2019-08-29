@@ -82,7 +82,7 @@ class Wrapper:
 
                         metric_holder = []
                         for function in array:
-                            metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap).tolist())
+                            metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
                             metric_container[function.__name__].append(metric_holder)
 
                     hour = next_hour
@@ -109,12 +109,12 @@ class Wrapper:
 
                     metric_holder = []
                     for function in array:
-                        metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap).tolist())
+                        metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
                         metric_container[function.__name__].append(metric_holder)
 
         return metric_container, date_container
 
-    def room_transfers(self, labels, timestamps, timespan, overlap, fs=None):
+    def room_transfers(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the room transfers.
 
@@ -142,7 +142,7 @@ class Wrapper:
 
         return container
 
-    def duration_walking(self, labels, timestamps, timespan, overlap, fs=None):
+    def duration_walking(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the duration walking.
 
@@ -169,7 +169,7 @@ class Wrapper:
         container = self.label_mappings(container, 1, 'walking')
         return container
 
-    def duration_sitting(self, labels, timestamps, timespan, overlap, fs=None):
+    def duration_sitting(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the duration sitting.
 
@@ -196,7 +196,7 @@ class Wrapper:
         container = self.label_mappings(container, 1, 'sitting')
         return container
 
-    def duration_sleeping(self, labels, timestamps, timespan, overlap, fs=None):
+    def duration_sleeping(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the duration sleeping.
 
@@ -223,7 +223,7 @@ class Wrapper:
         container = self.label_mappings(container, 1, 'sleeping')
         return container
 
-    def duration_washing(self, labels, timestamps, timespan, overlap, fs=None):
+    def duration_washing(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the duration washing.
 
@@ -250,7 +250,7 @@ class Wrapper:
         container = self.label_mappings(container, 1, 'washing')
         return container
 
-    def duration_eating(self, labels, timestamps, timespan, overlap, fs=None):
+    def duration_eating(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the duration eating.
 
@@ -277,7 +277,7 @@ class Wrapper:
         container = self.label_mappings(container, 1, 'eating')
         return container
 
-    def duration_studying(self, labels, timestamps, timespan, overlap, fs=None):
+    def duration_studying(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the duration studying.
 
@@ -304,7 +304,7 @@ class Wrapper:
         container = self.label_mappings(container, 1, 'studying')
         return container
 
-    def number_of_bathroom_visits(self, labels, timestamps, timespan, overlap, fs=None):
+    def number_of_bathroom_visits(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the number of bathroom visits.
 
@@ -331,7 +331,7 @@ class Wrapper:
         container = self.label_mappings_localisation(container, 'bathroom')
         return container
 
-    def number_of_living_room_visits(self, labels, timestamps, timespan, overlap, fs=None):
+    def number_of_living_room_visits(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the number of living room visits.
 
@@ -358,7 +358,7 @@ class Wrapper:
         container = self.label_mappings_localisation(container, 'living_room')
         return container
 
-    def number_of_unique_activities(self, labels, timestamps, timespan, overlap, fs=None):
+    def number_of_unique_activities(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the number of unique activities per window.
 
@@ -385,7 +385,7 @@ class Wrapper:
         container = self.label_mappings(container, 0)
         return container
 
-    def number_of_unique_locations(self, labels, timestamps, timespan, overlap, fs=None):
+    def number_of_unique_locations(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the number of unique locations per window.
 
@@ -412,7 +412,7 @@ class Wrapper:
         container = self.label_mappings_localisation(container)
         return container
 
-    def walking_speed(self, labels, timestamps, timespan, overlap, fs=None):
+    def walking_speed(self, labels, timestamps, timespan, overlap, fs):
 
     # """
     #     Wrapper to output the average walking speed.

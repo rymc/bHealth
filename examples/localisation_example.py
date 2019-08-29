@@ -138,7 +138,7 @@ if __name__ == '__main__':
         print_summary(clf_grid, X_test, y_test)
 
         metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'daily')
-        plot_metrics(metric_container_daily, date_container_daily)
+        plot_metrics(metric_container_daily, date_container_daily, labels_ = ['foyer', 'bedroom', 'living_room', 'bathroom'])
 
         plt.show()
 
