@@ -231,6 +231,22 @@ def data_loader_rssi(house_):
         local = datetime.fromtimestamp(t)
         ts[idx] = local.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
+    descriptor_map = {
+        'foyer': [0, 1],
+        'bedroom': [2, 3, 4, 5, 6, 7, 8, 79, 81],
+        'living_room': [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 77, 78, 82],
+        'bathroom': [21, 22, 80]
+    }
 
+    labels_ = np.zeros([len(y)])
+
+    for id_key, key in enumerate(descriptor_map):
+
+        for id, label in enumerate(y):
+
+            if int(label) in descriptor_map[key]:
+                labels_[id] = id_key
+
+    y = labels_
 
     return ts, X, y

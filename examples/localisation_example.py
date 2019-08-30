@@ -3,7 +3,7 @@ sys.path.append('../')
 
 import pandas as pd
 import numpy as np
-from digihealth import data_loading_debug
+from digihealth import data_loading
 
 from digihealth.visualisations import plot_metrics
 from digihealth.visualisations import features_figure
@@ -27,7 +27,7 @@ from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y(house_):
 
-    ts, X, y = data_loading_debug.data_loader_rssi_debug(house_)
+    ts, X, y = data_loading.data_loader_rssi(house_)
     return ts, X, y
 
 
@@ -43,7 +43,7 @@ def split_train_test(X, y):
     train_index, test_index = skf.split(X, y).__next__()
     X_train, X_test = X[train_index], X[test_index]
     y_train, y_test = y[train_index], y[test_index]
-    plot_test_train_splits(y_train, y_test)
+    # plot_test_train_splits(y_train, y_test)
     return (X_train, y_train), (X_test, y_test)
 
 
