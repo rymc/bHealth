@@ -20,6 +20,8 @@ class TestMetrics(unittest.TestCase):
         Test average activities per window.
         """
 
+        print('Test average activities per window.')
+
         winlength = 3
 
         # two types of label
@@ -77,6 +79,7 @@ class TestMetrics(unittest.TestCase):
         """
         Test duration of activities per window.
         """
+        print('Test duration of activities per window.')
 
         winlength = 3
 
@@ -136,6 +139,7 @@ class TestMetrics(unittest.TestCase):
         """
         Test average activity change per window.
         """
+        print('Test average activity change per window.')
 
         winlength = 9
 
@@ -148,7 +152,7 @@ class TestMetrics(unittest.TestCase):
         groundtruth = [[ [ 2, 2 ], [ 2, 2 ] ]]
 
         indicies = np.arange(len(labels))
-        metr = Metrics(timestamp, aggregation_duration=9, window_overlap=0)
+        metr = Metrics(timestamp, aggregation_duration=9, window_overlap=1)
 
         metr.current_position = winlength
         final_result = []
@@ -176,6 +180,7 @@ class TestMetrics(unittest.TestCase):
         """
         Test speed.
         """
+        print('Test speed.')
 
         winlength = 9
 
@@ -187,7 +192,7 @@ class TestMetrics(unittest.TestCase):
 
         adjecency = [[0, 1], [1, 0]]
 
-        groundtruth = [0.43]
+        groundtruth = np.array([0, 1, 0, 0, 1, 0, 0, 1])
 
         indicies = np.arange(len(labels))
         metr = Metrics(timestamp, aggregation_duration=9, window_overlap=1)
@@ -211,7 +216,7 @@ class TestMetrics(unittest.TestCase):
             else:
                 break
 
-        for x, y in zip(final_result, groundtruth):
+        for x, y in zip(np.squeeze(final_result), groundtruth):
             np.testing.assert_almost_equal(x, y)
 
 
@@ -219,6 +224,7 @@ class TestMetrics(unittest.TestCase):
         """
         Test average inter label durations.
         """
+        print('Test average inter label durations.')
 
         winlength = 9
 

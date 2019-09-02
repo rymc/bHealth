@@ -143,7 +143,7 @@ class Metrics:
 
         label_change_array = np.zeros((len(unique_lab), len(unique_lab)))
 
-        for idx in range(1, len(labels_)):
+        for idx in range(0, len(labels_)):
             label_change_array[int(np.where(unique_lab == labels_[idx-1])[0][0]), int(np.where(unique_lab == labels_[idx])[0][0])] += 1
 
         return label_change_array
@@ -175,9 +175,10 @@ class Metrics:
 
         for idx in range(1, len(labels_)):
             label_change_array[idx] += adjacency[int(np.where(unique_lab == labels_[idx-1])[0][0]), int(np.where(unique_lab == labels_[idx])[0][0])]
-            label_time_array[idx] += timestamps[idx - 1] - timestamps[idx]
+            label_time_array[idx] += np.abs(timestamps[idx - 1] - timestamps[idx])
 
         distances = np.divide(label_change_array, label_time_array)
+        distances = np.nan_to_num(distances)
 
         return distances
 
