@@ -3,7 +3,7 @@ sys.path.append('../')
 
 import pandas as pd
 import numpy as np
-from digihealth import data_loading
+from digihealth import data_loading_debug
 
 from digihealth.visualisations import plot_metrics
 from digihealth.visualisations import features_figure
@@ -27,7 +27,7 @@ from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y(house_):
 
-    ts, X, y = data_loading.data_loader_rssi(house_)
+    ts, X, y = data_loading_debug.data_loader_rssi_debug(house_)
     return ts, X, y
 
 

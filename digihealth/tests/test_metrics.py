@@ -134,7 +134,6 @@ class TestMetrics(unittest.TestCase):
         for x, y in zip(final_result, groundtruth):
             np.testing.assert_almost_equal(x, y)
 
-
     def test_average_activity_change_per_window(self):
         """
         Test average activity change per window.
@@ -218,7 +217,6 @@ class TestMetrics(unittest.TestCase):
 
         for x, y in zip(np.squeeze(final_result), groundtruth):
             np.testing.assert_almost_equal(x, y)
-
 
     def test_average_inter_label_durations(self):
         """

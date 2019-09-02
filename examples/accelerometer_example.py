@@ -9,6 +9,7 @@ from digihealth.visualisations import features_figure
 from digihealth.visualisations import plot_features
 from digihealth.visualisations import plot_test_train_splits
 from digihealth import data_loading
+from digihealth import data_loading_debug
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -20,7 +21,7 @@ from digihealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y():
 
-    labels, ts, xyz = data_loading.data_loader_accelerometer()
+    labels, ts, xyz = data_loading_debug.data_loader_accelerometer_debug()
     return ts, xyz, labels
 
 def preprocess_X_y(ts, X, y):
