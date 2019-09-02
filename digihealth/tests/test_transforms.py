@@ -19,6 +19,8 @@ class TestTransforms(unittest.TestCase):
         """
         Test mean crossings.
         """
+        print('Test mean crossings.')
+
         x_list = [[-1, -1, -1],
                   [0, 0, 0],
                   [1, 5, 9],
@@ -56,6 +58,7 @@ class TestTransforms(unittest.TestCase):
         """
         Test zero crossings.
         """
+        print('Test zero crossings.')
         x_list = [[-1, -1, -1],
                   [0, 0, 0],
                   [1, -4, 5, -10],
@@ -93,6 +96,8 @@ class TestTransforms(unittest.TestCase):
         """
         Test 25th percentiles.
         """
+        print('Test 25th percentiles.')
+
         x_list = [[1, 2, 3, 4, 5, 6, 7],
                   [5, 6, 3, 1, 3],
                   [10, -10, -90, -90.5, -100, -200]]
@@ -127,6 +132,7 @@ class TestTransforms(unittest.TestCase):
         """
         Test 75th percentiles.
         """
+        print('Test 75th percentiles.')
         x_list = [[5, 6, 7, 8, 9],
                   [5,5.5,4.5,4.75,5.35,5.45,6.15],
                   [-10, -40, 50, 2, 4, 5]]
@@ -161,6 +167,7 @@ class TestTransforms(unittest.TestCase):
         """
         Test interquartiles.
         """
+        print('Test interquartiles.')
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1,2,3,4,2,3,4,10,5,7,8,11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
@@ -194,6 +201,7 @@ class TestTransforms(unittest.TestCase):
         """
         Test skewness.
         """
+        print('Test skewness.')
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
@@ -227,6 +235,7 @@ class TestTransforms(unittest.TestCase):
         """
         Test kurtosis.
         """
+        print('Test kurtosis.')
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
@@ -260,6 +269,7 @@ class TestTransforms(unittest.TestCase):
         """
         Test spectral energy.
         """
+        print('Test spectral energy.')
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]
@@ -273,6 +283,7 @@ class TestTransforms(unittest.TestCase):
         """
         Test spectral entropy.
         """
+        print('Test spectral entropy.')
         x_list = [[5, 6, 7, 8, 9, 10],
                   [1, 2, 3, 4, 2, 3, 4, 10, 5, 7, 8, 11],
                   [7, 7, 31, 31, 47, 75, 87, 115, 116, 119, 119, 155, 177]]

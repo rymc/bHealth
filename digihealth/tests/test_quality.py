@@ -23,6 +23,7 @@ class TestQuality(unittest.TestCase):
         """
         Test continuity.
         """
+        print('Test continuity.')
 
         quali = DataQuality('H')
         #Generate some timestamps
@@ -45,6 +46,7 @@ class TestQuality(unittest.TestCase):
         """
         Test variance.
         """
+        print('Test variance.')
 
         number_of_columns = 5
         number_of_rows = 200
@@ -65,6 +67,7 @@ class TestQuality(unittest.TestCase):
         """
         Test anomalies.
         """
+        print('Test anomalies.')
 
         number_of_columns = 5
         number_of_rows = 200
@@ -92,6 +95,7 @@ class TestQuality(unittest.TestCase):
         """
         Test contents.
         """
+        print('Test contents.')
 
         number_of_columns = 2
         number_of_rows = 200
@@ -124,6 +128,10 @@ class TestQuality(unittest.TestCase):
         np.testing.assert_almost_equal(spearman_, spearman_gt)
 
     def test_uniqueness(self):
+        """
+        Test uniqueness.
+        """
+        print('Test uniqueness.')
 
         quali = DataQuality('H')
         # Generate some timestamps
