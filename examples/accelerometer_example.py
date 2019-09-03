@@ -140,11 +140,11 @@ if __name__ == '__main__':
     ts, X, y = get_raw_ts_X_y()
     features_figure(X[0:X.size:50], feature_names=['X', 'Y', 'Z'])
 
-    X, y = preprocess_X_y(ts, X, y)
-    (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
-    clf_grid = get_classifier_grid()
-    clf_grid.fit(X_train, y_train)
-    print_summary(clf_grid, X_test, y_test)
+    # X, y = preprocess_X_y(ts, X, y)
+    # (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
+    # clf_grid = get_classifier_grid()
+    # clf_grid.fit(X_train, y_train)
+    # print_summary(clf_grid, X_test, y_test)
 
     metric_container_daily, date_container_daily = activity_metrics(y, ts, 'daily')
     plot_metrics(metric_container_daily, date_container_daily)

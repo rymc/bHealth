@@ -177,17 +177,19 @@ def localisation_metrics(labels, timestamps, span):
                  [3.3, 1.5, 4, 0, 1],
                  [4, 3, 1, 1, 0]]
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency)
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, csv_prep=r'../output/localisation_metrics.csv', adjecency=adjecency)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
     df_label = pd.DataFrame(labels, columns=['Label'])
 
-    metric_array= [ metrics.walking_speed,
-                    metrics.room_transfers,
-                    metrics.number_of_unique_locations]
+    metric_array= [ metrics.duration_in_bathroom,
+                    metrics.duration_in_bedroom_1,
+                    metrics.duration_in_bedroom_2,
+                    metrics.duration_in_kitchen,
+                    metrics.duration_in_living_room]
 
-    metric_container, date_container = metrics.run_metric_array(metric_array)
+    metric_container, date_container = metrics.run_metric_array_csv(metric_array)
 
     return metric_container, date_container
 
@@ -204,7 +206,7 @@ if __name__ == '__main__':
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
 
-    metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'daily')
+    metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'hourly')
     plot_metrics(metric_container_daily, date_container_daily, labels_=['bathroom',
                                                                         'bedroom 1',
                                                                         'bedroom 2',

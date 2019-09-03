@@ -4,6 +4,7 @@ metric_wrappers.py
 The main class containing human-readable wrappers for metrics.
 """
 
+import csv
 import numpy as np
 import pandas as pd
 from digihealth.metrics import Metrics
@@ -16,7 +17,7 @@ class Wrapper:
     If you want to add your own specific metric function, do it here.
     """
 
-    def __init__(self, labels, timestamps, duration, overlap, fs, label_descriptor_map, adjecency=None):
+    def __init__(self, labels, timestamps, duration, overlap, fs, label_descriptor_map, csv_prep=None, adjecency=None):
         """
         Wrapper to output the average walking speed.
 
@@ -41,6 +42,7 @@ class Wrapper:
         self.timestamps = timestamps
         self.overlap = overlap
         self.fs = fs
+        self.csv = csv_prep
 
         self.adjecency = adjecency
         self.label_descriptor_map = label_descriptor_map
@@ -53,6 +55,7 @@ class Wrapper:
             self.duration = 86400
         elif duration == 'hourly':
             self.duration = 3600
+
 
     def run_metric_array(self, array):
         """
@@ -123,6 +126,83 @@ class Wrapper:
                     for function in array:
                         metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
                         metric_container[function.__name__].append(metric_holder)
+
+        return metric_container, date_container
+
+    def run_metric_array_csv(self, array):
+        """
+        Function to run the metric arrays
+
+        Parameters
+        ----------
+        array
+            Vector of metric functions to run.
+
+        Returns
+        -------
+        metric container
+            Container holding the metrics outlined in 'array' parameter. This is indexed by each metric in sequence, followed by the output.
+        """
+
+        if self.duration == 3600:
+            unique_days = self.df_time['Time'].dt.normalize().unique()
+            date_container = []
+            metric_container = {}
+            metric_container['datetime'] = []
+            for function in array:
+                metric_container[function.__name__] = []
+
+            for day in unique_days:
+                hour = day
+
+                for hr in range(23):
+                    next_hour = hour + np.timedelta64(1, 'h')
+                    mask = ((self.df_time['Time'] > hour) & (self.df_time['Time'] <= next_hour))
+                    times = self.df_time.loc[mask]
+                    labs = self.df_label.loc[mask]
+
+                    if labs.size > 1:
+
+                        metric_container['datetime'].append(hour)
+
+                        times = times.astype(np.int64) // 10 ** 6
+                        times = times / 1000
+
+                        metric_holder = []
+                        for function in array:
+                            metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
+                            metric_container[function.__name__].append(metric_holder)
+
+                    hour = next_hour
+
+        elif self.duration == 86400:
+            unique_days = self.df_time['Time'].dt.normalize().unique()
+            date_container = []
+            metric_container = {}
+            metric_container['datetime'] = []
+            for function in array:
+                metric_container[function.__name__] = []
+
+            for day in unique_days:
+
+                next_day = day + np.timedelta64(1, 'D')
+                mask = ((self.df_time['Time'] > day) & (self.df_time['Time'] <= next_day))
+                times = self.df_time.loc[mask]
+                labs = self.df_label.loc[mask]
+
+                if labs.size > 1:
+                    metric_container['datetime'].append(day)
+
+                    times = times.astype(np.int64) // 10 ** 6
+                    times = times / 1000
+
+                    metric_holder = []
+                    for function in array:
+                        metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
+                        metric_container[function.__name__].append(metric_holder)
+
+        csv_out = pd.DataFrame(metric_container)
+        csv_out.to_csv(self.csv)
 
         return metric_container, date_container
 
@@ -316,6 +396,141 @@ class Wrapper:
         container = self.label_mappings(container, 1, 'studying')
         return container
 
+    def duration_in_bathroom(self, labels, timestamps, timespan, overlap, fs):
+        """
+        Wrapper to output the duration studying.
+
+        Parameters
+        ----------
+        labels
+           Vector of labels.
+        timestamps
+           Vector of timestamps.
+        timespan
+           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
+        overlap
+           Amount of overlap for the calculation of the transfers.
+        fs
+           Sampling frequency.
+
+        Returns
+        -------
+        metr.number_of_label_changes_per_window(labels, timestamps)
+           Output the duration studying.
+        """
+        metr = Metrics(timestamps, timespan, overlap, fs)
+        container = metr.duration_of_labels_per_window(labels, timestamps)
+        container = self.label_mappings_localisation(container, 'bathroom')
+        return container
+
+    def duration_in_bedroom_1(self, labels, timestamps, timespan, overlap, fs):
+        """
+        Wrapper to output the duration studying.
+
+        Parameters
+        ----------
+        labels
+           Vector of labels.
+        timestamps
+           Vector of timestamps.
+        timespan
+           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
+        overlap
+           Amount of overlap for the calculation of the transfers.
+        fs
+           Sampling frequency.
+
+        Returns
+        -------
+        metr.number_of_label_changes_per_window(labels, timestamps)
+           Output the duration studying.
+        """
+        metr = Metrics(timestamps, timespan, overlap, fs)
+        container = metr.duration_of_labels_per_window(labels, timestamps)
+        container = self.label_mappings_localisation(container, 'bedroom 1')
+        return container
+
+    def duration_in_bedroom_2(self, labels, timestamps, timespan, overlap, fs):
+        """
+        Wrapper to output the duration studying.
+
+        Parameters
+        ----------
+        labels
+           Vector of labels.
+        timestamps
+           Vector of timestamps.
+        timespan
+           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
+        overlap
+           Amount of overlap for the calculation of the transfers.
+        fs
+           Sampling frequency.
+
+        Returns
+        -------
+        metr.number_of_label_changes_per_window(labels, timestamps)
+           Output the duration studying.
+        """
+        metr = Metrics(timestamps, timespan, overlap, fs)
+        container = metr.duration_of_labels_per_window(labels, timestamps)
+        container = self.label_mappings_localisation(container, 'bedroom 2')
+        return container
+
+    def duration_in_kitchen(self, labels, timestamps, timespan, overlap, fs):
+        """
+        Wrapper to output the duration studying.
+
+        Parameters
+        ----------
+        labels
+           Vector of labels.
+        timestamps
+           Vector of timestamps.
+        timespan
+           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
+        overlap
+           Amount of overlap for the calculation of the transfers.
+        fs
+           Sampling frequency.
+
+        Returns
+        -------
+        metr.number_of_label_changes_per_window(labels, timestamps)
+           Output the duration studying.
+        """
+        metr = Metrics(timestamps, timespan, overlap, fs)
+        container = metr.duration_of_labels_per_window(labels, timestamps)
+        container = self.label_mappings_localisation(container, 'kitchen')
+        return container
+
+    def duration_in_living_room(self, labels, timestamps, timespan, overlap, fs):
+        """
+        Wrapper to output the duration studying.
+
+        Parameters
+        ----------
+        labels
+           Vector of labels.
+        timestamps
+           Vector of timestamps.
+        timespan
+           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
+        overlap
+           Amount of overlap for the calculation of the transfers.
+        fs
+           Sampling frequency.
+
+        Returns
+        -------
+        metr.number_of_label_changes_per_window(labels, timestamps)
+           Output the duration studying.
+        """
+        metr = Metrics(timestamps, timespan, overlap, fs)
+        container = metr.duration_of_labels_per_window(labels, timestamps)
+        container = self.label_mappings_localisation(container, 'living room')
+        return container
+
     def number_of_bathroom_visits(self, labels, timestamps, timespan, overlap, fs):
         """
         Wrapper to output the number of bathroom visits.
@@ -392,6 +607,8 @@ class Wrapper:
         metr.number_of_label_changes_per_window(labels, timestamps)
            Output the number of unique activities per window.
         """
+
+
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.duration_of_labels_per_window(labels, timestamps)
         container = self.label_mappings(container, 0)
@@ -578,15 +795,20 @@ class Wrapper:
             for key in self.label_descriptor_map:
                 for id, label in enumerate(container):
                     if int(label[0]) in self.label_descriptor_map[key]:
-                        returner_.update({key: label[1]})
+                        if self.csv is not None:
+                            returner_.append(label[1])
+                        else:
+                            returner_.update({key : label[1]})
         else:
             for id, label in enumerate(container):
                 if int(label[0]) in self.label_descriptor_map[label_to_extract]:
                     container_.append(label[1])
 
-
             container_ = np.sum(container_)
-            returner_ = {label_to_extract: container_}
+            if self.csv is not None:
+                returner_ = container_
+            else:
+                returner_ = {label_to_extract : container_}
 
         return returner_
 
@@ -632,13 +854,20 @@ class Wrapper:
         #         81: 'sleeping',
         #         82: 'cooking'}
         container_ = []
-        returner_ = {}
+
+        if self.csv is not None:
+            returner_ = []
+        else:
+            returner_ = {}
 
         if label_to_extract is None:
             for key in self.label_descriptor_map:
                 for id, label in enumerate(container):
                     if int(label[0]) == self.label_descriptor_map[key]:
-                        returner_.update({key : label[1]})
+                        if self.csv is not None:
+                            returner_.append(label[1])
+                        else:
+                            returner_.update({key : label[1]})
         else:
             for id, label in enumerate(container):
                 if int(label[0]) == self.label_descriptor_map[label_to_extract]:
@@ -646,6 +875,9 @@ class Wrapper:
 
             if is_duration:
                 container_ = np.sum(container_)
-                returner_ = {label_to_extract : container_}
+                if self.csv is not None:
+                    returner_ = container_
+                else:
+                    returner_ = {label_to_extract : container_}
 
         return returner_

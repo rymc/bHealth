@@ -109,7 +109,7 @@ def localisation_metrics(labels, timestamps, span):
                  [3, 6, 0, 4],
                  [3.3, 1.5, 4, 0]]
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency)
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency=adjecency)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])

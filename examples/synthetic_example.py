@@ -185,7 +185,7 @@ def activity_metrics(labels, timestamps, span):
         'washing': 5
     }
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency=None)
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, csv_prep=r'../output/activity_metrics.csv', adjecency=None)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
@@ -196,10 +196,9 @@ def activity_metrics(labels, timestamps, span):
                     metrics.duration_washing,
                     metrics.duration_eating,
                     metrics.duration_sleeping,
-                    metrics.duration_studying,
-                    metrics.number_of_unique_activities]
+                    metrics.duration_studying]
 
-    metric_container, date_container = metrics.run_metric_array(metric_array)
+    metric_container, date_container = metrics.run_metric_array_csv(metric_array)
 
     return metric_container, date_container
 
@@ -214,7 +213,7 @@ if __name__ == '__main__':
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
 
-    metric_container_daily, date_container_daily = activity_metrics(y, ts, 'daily')
+    metric_container_daily, date_container_daily = activity_metrics(y, ts, 'hourly')
     plot_metrics(metric_container_daily, date_container_daily)
 
     plt.show()
