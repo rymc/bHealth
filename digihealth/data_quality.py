@@ -23,12 +23,6 @@ class DataQuality:
 
         Parameters
         ----------
-        time_cols
-            Index of the column containing the timestamps.
-        label_cols
-            Index of the column containing the labels.
-        feature_cols
-            Index of the column containing the features.
         sample_rate
             Sample rate of the provided data.
         """
@@ -59,6 +53,11 @@ class DataQuality:
             A vector of means to evaluate.
         covariances
             A matrix of covariances.
+
+        Returns
+        ----------
+        prob
+            Probability of a point being part of a distribtion
         """
         m_dist_x = np.dot((point - means).transpose(), np.linalg.inv(covariances))
         m_dist_x = np.dot(m_dist_x, (point - means))
@@ -73,6 +72,11 @@ class DataQuality:
         ----------
         timestamps
             A vector of timestamps. As default, this can be as numpy time array.
+
+        Returns
+        ----------
+        reduction_
+            Proportion of reduction of the entire dataset, given the discontinous set of data.
         """
         df_time = timestamps.values.astype('datetime64')
         number_of_instances_prior = len(df_time)
@@ -104,6 +108,11 @@ class DataQuality:
         ----------
         timestamps
             A vector of timestamps. As default, this can be as numpy time array.
+
+        Returns
+        ----------
+        uniqueness
+            Uniqueness of a dataset, as given by the proportion of unique labels to the number of all data points in the set.
         """
         uniqueness = 0
         number_of_instances = timestamps.shape[0]
@@ -124,6 +133,13 @@ class DataQuality:
         ----------
         dataset
             A table of data. This should be formatted as times in dimension 0 and features/data as dimension 1.
+
+        Returns
+        ----------
+        alert_
+            Binary alert flag, specifying an anomaly in variance.
+        variance_
+            The resulting variance of the dataset.
         """
         variance_ = np.zeros(dataset.shape[1])
         alert_ = 0
@@ -145,6 +161,12 @@ class DataQuality:
         ----------
         dataset
             A table of data. This should be formatted as times in dimension 0 and features/data as dimension 1.
+
+        Returns
+        ----------
+        outliers_
+            Binary variable specifying which data points are likely outliers. This is given as a table NxM, where
+            N is the number of data instances and M is the number of features.
         """
         threshold = -1000
 
@@ -176,6 +198,15 @@ class DataQuality:
         ----------
         dataset
             A table of data. This should be formatted as times in dimension 0 and features/data as dimension 1.
+
+        Returns
+        ----------
+        covariances_
+            Covariance of the dataset.
+        pearson_
+            Pearson coefficient of the feature set, given by MxM, where M is the length of the feature vector.
+        spearman_
+            Spearman coefficient of the feature set, given by MxM, where M is the length of the feature vector.
         """
         number_of_features = dataset.shape[1]
 
