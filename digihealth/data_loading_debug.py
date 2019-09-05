@@ -1,7 +1,8 @@
 """
-data_loading.py
+data_loading_debug.py
 ====================================
 File with data loading functions.
+This file is for debugging purposes only.
 """
 
 import numpy as np

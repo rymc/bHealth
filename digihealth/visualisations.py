@@ -28,10 +28,39 @@ def plot_test_train_splits(train, test):
 
 
 def check_metrics(metric, string):
+    """
+    Checks whether the metric is, what is specified in the string.
+
+    Parameters
+    ----------
+    metric
+        Metric name in string format.
+    string
+        String to check the metric name against, also in string format.
+
+    Returns
+    -------
+    string in metric
+        Binary flag specifying whether the metric is the string.
+    """
 
     return string in metric
 
 def plot_metrics(metrics, date, labels_=None):
+    """
+    Plots the metrics
+
+    (TODO: this is a placeholder function. It only plots more rudimentary of visuals. This function needs to be expanded.)
+
+    Parameters
+    ----------
+    metric
+        Metric container.
+    date
+        Date container.
+    labels_
+        Optional label container.
+    """
 
     for id, date_ in enumerate(date):
 
@@ -179,6 +208,22 @@ def plot_metrics(metrics, date, labels_=None):
         #     plt.title('specific_' + ' ' + str(date_))
 
 def plot_features(X, ts=None, feature_names=None, xlab=None, ylab=None):
+    """
+    Plots the raw features.
+
+    Parameters
+    ----------
+    X
+        Raw data.
+    ts
+        Optional raw timestamps parameter.
+    feature_names
+        Optional feature names parameter.
+    xlab
+        Optional label for X axis.
+    ylab
+        Optional label for Y axis.
+    """
 
     number_of_instances = X.shape[0]
     number_of_features = X.shape[1]
