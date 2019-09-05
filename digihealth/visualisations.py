@@ -10,6 +10,16 @@ from matplotlib.dates import DateFormatter
 
 
 def plot_test_train_splits(train, test):
+    """
+    Plots test train splits as proportions of each label.
+
+    Parameters
+    ----------
+    train
+        Training set.
+    test
+        Testing set.
+    """
 
     unique_labels_train, counts_train = np.unique(train, return_counts=True)
     unique_labels_test, counts_test = np.unique(test, return_counts=True)
