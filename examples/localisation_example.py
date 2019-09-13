@@ -3,12 +3,12 @@ sys.path.append('../')
 
 import pandas as pd
 import numpy as np
-from digihealth import data_loading_debug
+from bhealth import data_loading_debug
 
-from digihealth.visualisations import plot_metrics
-from digihealth.visualisations import features_figure
-from digihealth.visualisations import features_figure_scatter
-from digihealth.visualisations import plot_test_train_splits
+from bhealth.visualisations import plot_metrics
+from bhealth.visualisations import features_figure
+from bhealth.visualisations import features_figure_scatter
+from bhealth.visualisations import plot_test_train_splits
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -21,9 +21,9 @@ from sklearn.model_selection import StratifiedKFold
 
 import matplotlib.pyplot as plt
 
-from digihealth.metrics import Metrics
-from digihealth.transforms import Transforms
-from digihealth.metric_wrappers import Wrapper
+from bhealth.metrics import Metrics
+from bhealth.transforms import Transforms
+from bhealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y(house_):
 
