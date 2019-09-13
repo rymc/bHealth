@@ -1,6 +1,8 @@
-# NewLib
+# bHealth
 
-Let's create a library.
+![](bhealth.svg)
+
+This library is designed to be used with accelerometer and RSS data sets, collected as part of longitudinal studies in Digital Health
 
 ## Installation and requirements
 
