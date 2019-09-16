@@ -177,7 +177,12 @@ def localisation_metrics(labels, timestamps, span):
                  [3.3, 1.5, 4, 0, 1],
                  [4, 3, 1, 1, 0]]
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, csv_prep=r'../output/localisation_metrics.csv', adjecency=adjecency)
+    if not os.path.exists('./output/'):
+        os.mkdir('./output/')
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
+                      csv_prep=r'./output/localisation_metrics.csv',
+                      adjecency=adjecency)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
@@ -213,5 +218,4 @@ if __name__ == '__main__':
                                                                         'kitchen',
                                                                         'living room'])
 
-    plt.show()
-
+    plt.savefig(__file__.strip('.py'))

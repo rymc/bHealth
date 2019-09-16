@@ -168,7 +168,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     # Int this case every week has n_columns
     y_labels = y_labels.reshape((-1, n_columns)).astype(int)
 
-    fig, ax = polar_labels_figure(y_labels, labels, xticklabels,
+    fi, ax = polar_labels_figure(y_labels, labels, xticklabels,
                                   empty_rows=4, leading_labels=0, spiral=True,
                                   title="{} per box".format(resample), m=None)
     fig.savefig(filename, dpi=300)
@@ -185,7 +185,12 @@ def activity_metrics(labels, timestamps, span):
         'washing': 5
     }
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, csv_prep=r'../output/activity_metrics.csv', adjecency=None)
+    if not os.path.exists('./output/'):
+        os.mkdir('./output/')
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
+                      csv_prep=r'./output/activity_metrics.csv',
+                      adjecency=None)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
@@ -216,4 +221,4 @@ if __name__ == '__main__':
     metric_container_daily, date_container_daily = activity_metrics(y, ts, 'hourly')
     plot_metrics(metric_container_daily, date_container_daily)
 
-    plt.show()
+    plt.savefig(__file__.strip('.py'))
