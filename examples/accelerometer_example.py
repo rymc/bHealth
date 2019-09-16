@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append('../')
 
@@ -118,7 +119,12 @@ def activity_metrics(labels, timestamps, span):
                 'studying': 82
             }
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency=None)
+    if not os.path.exists('./output/'):
+        os.mkdir('./output/')
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
+                      csv_prep=r'./output/activity_metrics.csv',
+                      adjecency=None)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
@@ -147,6 +153,7 @@ if __name__ == '__main__':
     # print_summary(clf_grid, X_test, y_test)
 
     metric_container_daily, date_container_daily = activity_metrics(y, ts, 'daily')
-    plot_metrics(metric_container_daily, date_container_daily)
+    figures_dict = plot_metrics(metric_container_daily, date_container_daily)
 
-    plt.show()
+    for key, fig in figures_dict.items():
+        fig.savefig(os.path.join('./output/', key))
