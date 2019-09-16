@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.patches as mpatches
 from matplotlib.dates import DateFormatter
+import datetime
 
 
 def plot_test_train_splits(train, test):
@@ -72,6 +73,7 @@ def plot_metrics(metrics, date, labels_=None):
         Optional label container.
     """
 
+    figures_dict = {}
     for index, date_ in enumerate(date):
 
         props = []
@@ -79,6 +81,7 @@ def plot_metrics(metrics, date, labels_=None):
         speed_list = []
         average_speed = []
         max_speed = []
+        date_ = np.datetime64(date_, 'D')
 
         for metric in metrics:
 
@@ -97,14 +100,16 @@ def plot_metrics(metrics, date, labels_=None):
 
         if len(props) != 0:
             x = np.arange(len(props))
-            plt.figure()
-            plt.bar(x, np.squeeze(props))
-            plt.xticks(x, labs)
-            plt.ylabel('Time (s)')
-            plt.xlabel('Metric')
-            plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
+            fig, ax = plt.subplots()
+            ax.bar(x, np.squeeze(props))
+            ax.set_xticks(x, labs)
+            ax.set_ylabel('Time (s)')
+            ax.set_xlabel('Metric')
+            ax.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
                        fontsize=9, framealpha=0.7)
-            plt.title('durations_of_activities' + ' ' + str(date_))
+            title = 'durations_of_activities' + ' ' + str(date_)
+            ax.set_title(title)
+            figures_dict[title.replace(' ', '_')] = fig
 
         props = []
         labs = []
@@ -124,11 +129,13 @@ def plot_metrics(metrics, date, labels_=None):
                             labs.append(str(key))
 
                 if len(props) != 0:
-                    plt.figure()
-                    plt.pie(np.squeeze(props), labels=labs, autopct='%1.0f%%')
-                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
-                               fontsize=9, framealpha=0.7)
-                    plt.title(metric + ' ' + str(date_))
+                    fig, ax = plt.subplots()
+                    ax.pie(np.squeeze(props), labels=labs, autopct='%1.0f%%')
+                    ax.legend(loc='upper center', ncol=6, fancybox=True,
+                              shadow=False, fontsize=9, framealpha=0.7)
+                    title = metric + ' ' + str(date_)
+                    ax.set_title(title)
+                    figures_dict[title.replace(' ', '_')] = fig
 
         for metric in metrics:
 
@@ -145,11 +152,14 @@ def plot_metrics(metrics, date, labels_=None):
                             labs.append(str(key))
 
                 if len(props) != 0:
-                    plt.figure()
-                    plt.pie(np.squeeze(props), labels=labs, autopct='%1.0f%%')
-                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
-                               fontsize=9, framealpha=0.7)
-                    plt.title(metric + ' ' + str(date_))
+                    fig, ax = plt.subplots()
+                    ax.pie(np.squeeze(props), labels=labs, autopct='%1.0f%%')
+                    ax.legend(loc='upper center', ncol=6, fancybox=True,
+                              shadow=False, fontsize=9, framealpha=0.7)
+                    # Check difference between this and the previous plot
+                    title = metric + ' ' + str(date_)
+                    ax.set_title(title)
+                    figures_dict[title.replace(' ', '_')] = fig
 
         for metric in metrics:
 
@@ -164,11 +174,12 @@ def plot_metrics(metrics, date, labels_=None):
 
                 if len(current_metrics_per_date) != 0:
                     data_frame_ =  pd.DataFrame(np.squeeze(current_metrics_per_date))
-                    plt.figure()
-                    sn.heatmap(data_frame_, annot=True, xticklabels=xlabs, yticklabels=ylabs)
-                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
-                               fontsize=9, framealpha=0.7)
-                    plt.title(metric + ' ' + str(date_))
+                    fig, ax = plt.subplots()
+                    sn.heatmap(data_frame_, annot=True, xticklabels=xlabs,
+                               yticklabels=ylabs, ax=ax)
+                    title = metric + ' ' + str(date_)
+                    ax.set_title(title)
+                    figures_dict[title.replace(' ', '_')] = fig
 
         for metric in metrics:
 
@@ -183,14 +194,17 @@ def plot_metrics(metrics, date, labels_=None):
                 if len(speed_list) != 0:
                     x = np.arange(len(speed_list))
                     average_speed = len(x) * [average_speed]
-                    plt.figure()
-                    plt.plot(speed_list)
-                    plt.plot(x, average_speed)
-                    plt.xlabel('Sample')
-                    plt.ylabel(r'Velocity $ms^{-1}$')
-                    plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
-                               fontsize=9, framealpha=0.7)
-                    plt.title('velocity_from_labels' + ' ' + str(date_))
+                    fig, ax = plt.subplots()
+                    ax.plot(speed_list)
+                    ax.plot(x, average_speed)
+                    ax.set_xlabel('Sample')
+                    ax.set_ylabel(r'Velocity $ms^{-1}$')
+                    ax.legend(loc='upper center', ncol=6, fancybox=True,
+                              shadow=False,
+                              fontsize=9, framealpha=0.7)
+                    title = 'velocity_from_labels' + ' ' + str(date_)
+                    ax.set_title(title)
+                    figures_dict[title.replace(' ', '_')] = fig
 
         # for metric in metrics:
         #
@@ -216,6 +230,8 @@ def plot_metrics(metrics, date, labels_=None):
         #     plt.legend(loc='upper center', ncol=6, fancybox=True, shadow=False,
         #                fontsize=9, framealpha=0.7)
         #     plt.title('specific_' + ' ' + str(date_))
+
+        return figures_dict
 
 def plot_features(X, ts=None, feature_names=None, xlab=None, ylab=None):
     """

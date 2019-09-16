@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append('../')
 
@@ -129,7 +130,8 @@ if __name__ == '__main__':
     for house_ in houses:
 
         ts, X, y = get_raw_ts_X_y(house_)
-        features_figure(X, feature_names=['AP1', 'AP2', 'AP3', 'AP4', 'AP5', 'AP6', 'AP7', 'AP8'])
+        features_figure(X, feature_names=['AP1', 'AP2', 'AP3', 'AP4', 'AP5',
+                                          'AP6', 'AP7', 'AP8'])
 
         X, y = preprocess_X_y(ts, X, y)
         (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
@@ -137,8 +139,15 @@ if __name__ == '__main__':
         clf_grid.fit(X_train, y_train)
         print_summary(clf_grid, X_test, y_test)
 
-        metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'daily')
-        plot_metrics(metric_container_daily, date_container_daily, labels_ = ['foyer', 'bedroom', 'living_room', 'bathroom'])
+        metric_container_daily, date_container_daily = localisation_metrics(y,
+                                                                            ts,
+                                                                            'daily')
+        figures_dict = plot_metrics(metric_container_daily,
+                                    date_container_daily, labels_ = ['foyer',
+                                                                     'bedroom',
+                                                                     'living_room',
+                                                                     'bathroom'])
 
-        plt.show()
-
+        for key, fig in figures_dict.items():
+            print(key)
+            fig.savefig(os.path.join('./output/', key))
