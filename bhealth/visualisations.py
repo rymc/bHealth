@@ -72,7 +72,7 @@ def plot_metrics(metrics, date, labels_=None):
         Optional label container.
     """
 
-    for id, date_ in enumerate(date):
+    for index, date_ in enumerate(date):
 
         props = []
         labs = []
@@ -86,7 +86,7 @@ def plot_metrics(metrics, date, labels_=None):
 
                 per_metric_container = metrics[metric]
 
-                current_metrics_per_date = per_metric_container[id]
+                current_metrics_per_date = per_metric_container[index]
 
                 for idx, proportion in enumerate(current_metrics_per_date):
                     for key in proportion:
@@ -115,7 +115,7 @@ def plot_metrics(metrics, date, labels_=None):
 
                 per_metric_container = metrics[metric]
 
-                current_metrics_per_date = per_metric_container[id]
+                current_metrics_per_date = per_metric_container[index]
 
                 for idx, proportion in enumerate(current_metrics_per_date):
                     for key in proportion:
@@ -136,7 +136,7 @@ def plot_metrics(metrics, date, labels_=None):
 
                 per_metric_container = metrics[metric]
 
-                current_metrics_per_date = per_metric_container[id]
+                current_metrics_per_date = per_metric_container[index]
 
                 for idx, proportion in enumerate(current_metrics_per_date):
                     for key in proportion:
@@ -157,7 +157,7 @@ def plot_metrics(metrics, date, labels_=None):
 
                 per_metric_container = metrics[metric]
 
-                current_metrics_per_date = per_metric_container[id]
+                current_metrics_per_date = per_metric_container[index]
 
                 xlabs = labels_
                 ylabs = labels_
@@ -176,9 +176,9 @@ def plot_metrics(metrics, date, labels_=None):
 
                 per_metric_container = metrics[metric]
 
-                speed_list = np.squeeze(per_metric_container[id][0])
-                average_speed = np.squeeze(per_metric_container[id][1])
-                max_speed = np.squeeze(per_metric_container[id][2])
+                speed_list = np.squeeze(per_metric_container[index][0])
+                average_speed = np.squeeze(per_metric_container[index][1])
+                max_speed = np.squeeze(per_metric_container[index][2])
 
                 if len(speed_list) != 0:
                     x = np.arange(len(speed_list))
@@ -198,7 +198,7 @@ def plot_metrics(metrics, date, labels_=None):
         #
         #         per_metric_container = metrics[metric]
         #
-        #         current_metrics_per_date = per_metric_container[id]
+        #         current_metrics_per_date = per_metric_container[index]
         #
         #         for idx, proportion in enumerate(current_metrics_per_date):
         #             for key in proportion:
