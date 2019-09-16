@@ -56,6 +56,9 @@ bhealth/visualisations.py             109    109     0%   1-316
 TOTAL                            1207    796    34%
 ```
 
+It is also possible to run the previous tests and coverage report with the
+script __run\_tests.sh__
+
 
 ## Examples
 
