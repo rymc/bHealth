@@ -643,27 +643,27 @@ class Wrapper:
 
     def walking_speed(self, labels, timestamps, timespan, overlap, fs):
 
-    # """
-    #     Wrapper to output the average walking speed.
-    #
-    #     Parameters
-    #     ----------
-    #     labels
-    #        Vector of labels.
-    #     timestamps
-    #        Vector of timestamps.
-    #     timespan
-    #        Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
-    #     overlap
-    #        Amount of overlap for the calculation of the transfers.
-    #     fs
-    #        Sampling frequency.
-    #
-    #     Returns
-    #     -------
-    #     metr.number_of_label_changes_per_window(labels, timestamps)
-    #        Output the average walking speed.
-    #     """
+        """
+        Wrapper to output the average walking speed.
+
+        Parameters
+        ----------
+        labels
+           Vector of labels.
+        timestamps
+           Vector of timestamps.
+        timespan
+           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
+        overlap
+           Amount of overlap for the calculation of the transfers.
+        fs
+           Sampling frequency.
+
+        Returns
+        -------
+        metr.number_of_label_changes_per_window(labels, timestamps)
+           Output the average walking speed.
+        """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.speed(labels, timestamps, self.adjecency)
         return np.abs(container), np.nanmean(np.abs(container)), np.nanmax(np.abs(container))
