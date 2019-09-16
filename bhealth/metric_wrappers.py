@@ -7,7 +7,7 @@ The main class containing human-readable wrappers for metrics.
 import csv
 import numpy as np
 import pandas as pd
-from digihealth.metrics import Metrics
+from bhealth.metrics import Metrics
 
 class Wrapper:
     """

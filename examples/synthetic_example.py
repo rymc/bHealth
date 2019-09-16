@@ -14,9 +14,9 @@ import numpy.ma as ma
 
 from datetime import datetime, timedelta
 
-from digihealth.visualisations import plot_metrics
-from digihealth.visualisations import features_figure
-from digihealth.visualisations import plot_test_train_splits
+from bhealth.visualisations import plot_metrics
+from bhealth.visualisations import features_figure
+from bhealth.visualisations import plot_test_train_splits
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -27,9 +27,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import StratifiedKFold
 
-from digihealth.synthetic import RandomTimeSeries
+from bhealth.synthetic import RandomTimeSeries
 #from synthetic import RandomTimeSeries
-from digihealth.metric_wrappers import Wrapper
+from bhealth.metric_wrappers import Wrapper
 
 np.random.seed(42)
 
@@ -118,8 +118,8 @@ def print_summary(clf_grid, X_test, y_test):
 
 
 def generate_visualisations(clf, X, y, ts, labels, features):
-    from digihealth.visualisations import labels_figure
-    from digihealth.visualisations import features_figure
+    from bhealth.visualisations import labels_figure
+    from bhealth.visualisations import features_figure
     y_pred = clf.predict(X)
     fig = plt.figure(figsize=(10, 4))
     ax = fig.add_subplot(2, 1, 1)
@@ -130,7 +130,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     fig.savefig('predictions.svg')
 
     # Ongoing example of polar plot
-    from digihealth.visualisations import polar_labels_figure
+    from bhealth.visualisations import polar_labels_figure
     def most_common(x):
         if len(x) == 0:
             return -1

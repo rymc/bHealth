@@ -6,7 +6,7 @@ Unit tests for Metrics class.
 
 import unittest
 import numpy as np
-from digihealth.metrics import Metrics
+from bhealth.metrics import Metrics
 
 class TestMetrics(unittest.TestCase):
     """

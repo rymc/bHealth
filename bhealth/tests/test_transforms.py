@@ -6,7 +6,7 @@ Unit tests for Transforms class.
 
 import unittest
 import numpy as np
-from digihealth.transforms import Transforms
+from bhealth.transforms import Transforms
 
 class TestTransforms(unittest.TestCase):
     """

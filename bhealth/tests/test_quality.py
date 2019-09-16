@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import random
 from numpy.random import randn
-from digihealth.data_quality import DataQuality
+from bhealth.data_quality import DataQuality
 from scipy import stats
 
 class TestQuality(unittest.TestCase):
