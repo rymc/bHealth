@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="70.205338mm"
-   height="27.28195mm"
-   viewBox="0 0 70.205338 27.28195"
+   width="80.541679mm"
+   height="26.881046mm"
+   viewBox="0 0 80.54168 26.881046"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
@@ -27,7 +27,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
      inkscape:cx="51.216949"
-     inkscape:cy="29.347957"
+     inkscape:cy="29.347956"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -56,7 +56,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-32.8708,-54.772692)">
+     transform="translate(-32.8708,-55.173596)">
     <flowRoot
        xml:space="preserve"
        id="flowRoot10"
@@ -80,7 +80,7 @@
          id="tspan18"
          x="50.648811"
          y="80.797615"
-         style="fill:#d4aa00;stroke:#000000;stroke-width:0.26458332">Health</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans Bold';fill:#d4aa00;stroke:#000000;stroke-width:0.26458332">Health</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16.93333244px;line-height:1.25;font-family:HelveticaNeue;-inkscape-font-specification:HelveticaNeue;letter-spacing:0px;word-spacing:0px;fill:#d4aa00;fill-opacity:1;stroke:#000000;stroke-width:0.26458332"
@@ -91,7 +91,7 @@
          id="tspan4530"
          x="51.606602"
          y="67.417259"
-         style="font-size:6.3499999px;fill:#d4aa00;stroke:#000000;stroke-width:0.26458332">ristol</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.3499999px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans Bold';fill:#d4aa00;stroke:#000000;stroke-width:0.26458332">ristol</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.39999962px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#d4aa00;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -105,7 +105,7 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.75px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';fill:#d4aa00;stroke:#000000;stroke-width:0.26458332">B</tspan></text>
     <g
        id="g1011"
-       transform="matrix(0.47697738,0.40434924,-0.40434924,0.47697738,66.721498,27.647943)">
+       transform="matrix(0.47697738,0.40434924,-0.40434924,0.47697738,71.799619,28.048847)">
       <ellipse
          ry="6.4728417"
          rx="4.1104908"
