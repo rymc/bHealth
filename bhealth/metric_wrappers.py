@@ -173,7 +173,9 @@ class Wrapper:
 
         return container
 
-    def duration_walking(self, labels, timestamps, timespan, overlap, fs):
+
+    def duration_activity(self, labels, timestamps, timespan, overlap, fs,
+                          activity):
         """
         Wrapper to output the duration walking.
 
@@ -197,143 +199,26 @@ class Wrapper:
         """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 1, 'walking')
+        container = self.label_mappings(container, 1, activity)
         return container
 
-    def duration_sitting(self, labels, timestamps, timespan, overlap, fs):
-        """
-        Wrapper to output the duration sitting.
+    def duration_walking(self, *args):
+        return self.duration_activity(self, *args, activity='walking')
 
-        Parameters
-        ----------
-        labels
-           Vector of labels.
-        timestamps
-           Vector of timestamps.
-        timespan
-           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
-        overlap
-           Amount of overlap for the calculation of the transfers.
-        fs
-           Sampling frequency.
+    def duration_sitting(self, *args):
+        return self.duration_activity(self, *args, activity='sitting')
 
-        Returns
-        -------
-        metr.number_of_label_changes_per_window(labels, timestamps)
-           Output the duration sitting.
-        """
-        metr = Metrics(timestamps, timespan, overlap, fs)
-        container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 1, 'sitting')
-        return container
+    def duration_sleeping(self, *args):
+        return self.duration_activity(self, *args, activity='sleeping')
 
-    def duration_sleeping(self, labels, timestamps, timespan, overlap, fs):
-        """
-        Wrapper to output the duration sleeping.
+    def duration_washing(self, *args):
+        return self.duration_activity(self, *args, activity='washing')
 
-        Parameters
-        ----------
-        labels
-           Vector of labels.
-        timestamps
-           Vector of timestamps.
-        timespan
-           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
-        overlap
-           Amount of overlap for the calculation of the transfers.
-        fs
-           Sampling frequency.
+    def duration_eating(self, *args):
+        return self.duration_activity(self, *args, activity='eating')
 
-        Returns
-        -------
-        metr.number_of_label_changes_per_window(labels, timestamps)
-           Output the duration sleeping.
-        """
-        metr = Metrics(timestamps, timespan, overlap, fs)
-        container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 1, 'sleeping')
-        return container
-
-    def duration_washing(self, labels, timestamps, timespan, overlap, fs):
-        """
-        Wrapper to output the duration washing.
-
-        Parameters
-        ----------
-        labels
-           Vector of labels.
-        timestamps
-           Vector of timestamps.
-        timespan
-           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
-        overlap
-           Amount of overlap for the calculation of the transfers.
-        fs
-           Sampling frequency.
-
-        Returns
-        -------
-        metr.number_of_label_changes_per_window(labels, timestamps)
-           Output the duration washing.
-        """
-        metr = Metrics(timestamps, timespan, overlap, fs)
-        container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 1, 'washing')
-        return container
-
-    def duration_eating(self, labels, timestamps, timespan, overlap, fs):
-        """
-        Wrapper to output the duration eating.
-
-        Parameters
-        ----------
-        labels
-           Vector of labels.
-        timestamps
-           Vector of timestamps.
-        timespan
-           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
-        overlap
-           Amount of overlap for the calculation of the transfers.
-        fs
-           Sampling frequency.
-
-        Returns
-        -------
-        metr.number_of_label_changes_per_window(labels, timestamps)
-           Output the duration eating.
-        """
-        metr = Metrics(timestamps, timespan, overlap, fs)
-        container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 1, 'eating')
-        return container
-
-    def duration_studying(self, labels, timestamps, timespan, overlap, fs):
-        """
-        Wrapper to output the duration studying.
-
-        Parameters
-        ----------
-        labels
-           Vector of labels.
-        timestamps
-           Vector of timestamps.
-        timespan
-           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
-        overlap
-           Amount of overlap for the calculation of the transfers.
-        fs
-           Sampling frequency.
-
-        Returns
-        -------
-        metr.number_of_label_changes_per_window(labels, timestamps)
-           Output the duration studying.
-        """
-        metr = Metrics(timestamps, timespan, overlap, fs)
-        container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 1, 'studying')
-        return container
+    def duration_studying(self, *args):
+        return self.duration_activity(self, *args, activity='studying')
 
     def duration_in_location(self, labels, timestamps, timespan, overlap, fs,
                           location):
@@ -380,7 +265,8 @@ class Wrapper:
     def duration_in_living_room(self, *args):
         return self.duration_in_location(*args, location='living room')
 
-    def number_of_bathroom_visits(self, labels, timestamps, timespan, overlap, fs):
+    def number_of_visits_to_location(self, labels, timestamps, timespan,
+                                     overlap, fs, location):
         """
         Wrapper to output the number of bathroom visits.
 
@@ -404,35 +290,14 @@ class Wrapper:
         """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.number_of_label_changes_per_window(labels, timestamps)
-        container = self.label_mappings_localisation(container, 'bathroom')
+        container = self.label_mappings_localisation(container, location)
         return container
 
-    def number_of_living_room_visits(self, labels, timestamps, timespan, overlap, fs):
-        """
-        Wrapper to output the number of living room visits.
+    def number_of_bathroom_visits(self, *args):
+        return self.number_of_visits_to_location(*args, location='bathroom')
 
-        Parameters
-        ----------
-        labels
-           Vector of labels.
-        timestamps
-           Vector of timestamps.
-        timespan
-           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
-        overlap
-           Amount of overlap for the calculation of the transfers.
-        fs
-           Sampling frequency.
-
-        Returns
-        -------
-        metr.number_of_label_changes_per_window(labels, timestamps)
-           Output the number of living room visits.
-        """
-        metr = Metrics(timestamps, timespan, overlap, fs)
-        container = metr.number_of_label_changes_per_window(labels, timestamps)
-        container = self.label_mappings_localisation(container, 'living_room')
-        return container
+    def number_of_living_room_visits(self, *args):
+        return self.number_of_visits_to_location(*args, location='living room')
 
     def number_of_unique_activities(self, labels, timestamps, timespan, overlap, fs):
         """
