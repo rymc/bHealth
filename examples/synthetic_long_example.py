@@ -52,7 +52,7 @@ def get_raw_ts_X_y():
                 + [0, 1, 1, 0, 2, 3, 9],
                 ]
 
-    labels = [0, 1, 2, 3, 4]
+    labels = ['bathroom', 'bedroom', 'hall', 'kitchen', 'living room']
     rts = RandomTimeSeries(generator_list, labels=labels,
                            priors=[5, 2, 4, 3, 1], samplesize='1Min')
 
@@ -202,8 +202,9 @@ def localisation_metrics(labels, timestamps, span):
 if __name__ == '__main__':
     ts, X, y, labels, features = get_raw_ts_X_y()
 
-    features_figure(X, ts, feature_names=['rssi bathroom', 'rssi bedroom 1', 'rssi stairs', 'rssi hall',
-                'rssi kitchen', 'rssi living room'])
+    features_figure(X, ts, feature_names=['rssi bathroom', 'rssi bedroom 1',
+                                          'rssi stairs', 'rssi hall',
+                                          'rssi kitchen', 'rssi living room'])
 
     ts, X, y = preprocess_X_y(ts, X, y)
     (ts_train, X_train, y_train), (ts_test, X_test, y_test) = split_train_test(ts, X, y)
@@ -211,11 +212,9 @@ if __name__ == '__main__':
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
 
+    generate_visualisations(clf_grid.best_estimator_, X, y, ts, labels, features)
+
     metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'hourly')
-    plot_metrics(metric_container_daily, date_container_daily, labels_=['bathroom',
-                                                                        'bedroom 1',
-                                                                        'bedroom 2',
-                                                                        'kitchen',
-                                                                        'living room'])
+    plot_metrics(metric_container_daily, date_container_daily, labels_=labels)
 
     plt.savefig(__file__.strip('.py'))
