@@ -5,17 +5,19 @@ Typical health metrics are contained within this class.
 """
 
 import numpy as np
-import pandas as pd
+
 
 class Metrics:
     """
-    Metrics class. This class is used to obtain health metrics from the labels in the data.
-    The subjective interpretation of the output is left to the user.
+    Metrics class. This class is used to obtain health metrics from the labels
+    in the data. The subjective interpretation of the output is left to the
+    user.
 
     If you want to add your own metric function, do it here.
     """
 
-    def __init__(self, timestamps, aggregation_duration, window_overlap, fs=None):
+    def __init__(self, timestamps, aggregation_duration, window_overlap,
+                 fs=None):
         """
         Metrics constructor.
 
@@ -38,7 +40,7 @@ class Metrics:
         # elif aggregation_duration == 'second':
         #     duration = 1
 
-        if fs == None:
+        if fs is None:
             sampling_frequency = self.establish_sampling_frequency(timestamps)
         else:
             sampling_frequency = fs
@@ -67,7 +69,8 @@ class Metrics:
         Returns
         -------
         label_occurrence_array
-            Tuples array, which gives the percentage of occurence of a label in a provided vector.
+            Tuples array, which gives the percentage of occurence of a label in
+            a provided vector.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
@@ -98,7 +101,8 @@ class Metrics:
         Returns
         -------
         label_time_array
-            Tuples array, which gives the percentage of time of a given label in a provided vector.
+            Tuples array, which gives the percentage of time of a given label
+            in a provided vector.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
 
@@ -136,7 +140,8 @@ class Metrics:
         Returns
         -------
         label_change_array
-            A NxN array, where N is the number of states, which outlines the number of times each state transitions into another state.
+            A NxN array, where N is the number of states, which outlines the
+            number of times each state transitions into another state.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
         labels_ = np.array(labels)
@@ -144,14 +149,17 @@ class Metrics:
         label_change_array = np.zeros((len(unique_lab), len(unique_lab)))
 
         for idx in range(0, len(labels_)):
-            label_change_array[int(np.where(unique_lab == labels_[idx-1])[0][0]), int(np.where(unique_lab == labels_[idx])[0][0])] += 1
+            index_change = (int(np.where(unique_lab == labels_[idx-1])[0][0]),
+                            int(np.where(unique_lab == labels_[idx])[0][0]))
+            label_change_array[index_change] += 1
 
         return label_change_array
 
     @staticmethod
     def speed(labels, timestamps, adjacency):
         """
-        Return approximate speed of a person given the timestamps and the rate of change of labels, given their distance.
+        Return approximate speed of a person given the timestamps and the rate
+        of change of labels, given their distance.
 
         Parameters
         ----------
@@ -163,7 +171,8 @@ class Metrics:
         Returns
         -------
         speed
-            Given the timestamps and adjecency matrix, it outputs likely rate of change of displacement of the labels.
+            Given the timestamps and adjecency matrix, it outputs likely rate
+            of change of displacement of the labels.
         """
         unique_lab, counts_lab = np.unique(labels, return_counts=True)
         labels_ = np.array(labels)
@@ -194,12 +203,14 @@ class Metrics:
         timestamps
             A vector containing timestamps.
         normalise
-            Flag to normalise the vector, such that two labels next to each other are not considered unique.
+            Flag to normalise the vector, such that two labels next to each
+            other are not considered unique.
 
         Returns
         -------
         average_per_label
-            Given the timestamps and corresponding label vector, returns average time between two unique labels in the array.
+            Given the timestamps and corresponding label vector, returns
+            average time between two unique labels in the array.
         """
 
         # normalise parameter attempts to remove sequential labels
@@ -237,7 +248,8 @@ class Metrics:
                 for idx, time in enumerate(inter_label_times):
                     if np.isclose(time, (1/sampling_frequency)):
                         deletion_array.append(idx)
-                inter_label_times = np.delete(inter_label_times, deletion_array)
+                inter_label_times = np.delete(inter_label_times,
+                                              deletion_array)
 
             if inter_label_times.size == 0:
                 average_per_label[idx_outer] = 0
@@ -249,7 +261,8 @@ class Metrics:
 
     def establish_sampling_frequency(self, timestamps):
         """
-        Return the most likely sampling frequency from the timestamps in a time window. Use only in case actual fs is not available.
+        Return the most likely sampling frequency from the timestamps in a time
+        window. Use only in case actual fs is not available.
 
         Parameters
         ----------
@@ -259,7 +272,8 @@ class Metrics:
         Returns
         -------
         sampling_frequency
-            Programmatic way of establishing most likely sampling frequency given the timestamps.
+            Programmatic way of establishing most likely sampling frequency
+            given the timestamps.
         """
         timestamps_ = np.array(timestamps)
         sampling_frequency = 0
