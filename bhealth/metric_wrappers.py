@@ -69,16 +69,16 @@ class Wrapper:
         Returns
         -------
         metric container
-            Container holding the metrics outlined in 'array' parameter. This is indexed by each metric in sequence, followed by the output.
+            Container holding the metrics outlined in 'array' parameter. This
+            is indexed by each metric in sequence, followed by the output.
         """
+        unique_days = self.df_time['Time'].dt.normalize().unique()
+        date_container = []
+        metric_container = {}
+        for function in array:
+            metric_container[function.__name__] = []
 
-        if self.duration == 3600:
-            unique_days = self.df_time['Time'].dt.normalize().unique()
-            date_container = []
-            metric_container = {}
-            for function in array:
-                metric_container[function.__name__] = []
-
+        if self.duration == 60*60:
             for day in unique_days:
                 hour = day
 
@@ -102,13 +102,7 @@ class Wrapper:
 
                     hour = next_hour
 
-        elif self.duration == 86400:
-            unique_days = self.df_time['Time'].dt.normalize().unique()
-            date_container = []
-            metric_container = {}
-            for function in array:
-                metric_container[function.__name__] = []
-
+        elif self.duration == 60*60*24:
             for day in unique_days:
 
                 next_day = day + np.timedelta64(1, 'D')
@@ -131,7 +125,7 @@ class Wrapper:
 
     def run_metric_array_csv(self, array):
         """
-        Function to run the metric arrays
+        Function to run the metric arrays, and save to csv files
 
         Parameters
         ----------
@@ -141,65 +135,10 @@ class Wrapper:
         Returns
         -------
         metric container
-            Container holding the metrics outlined in 'array' parameter. This is indexed by each metric in sequence, followed by the output.
+            Container holding the metrics outlined in 'array' parameter. This
+            is indexed by each metric in sequence, followed by the output.
         """
-
-        if self.duration == 3600:
-            unique_days = self.df_time['Time'].dt.normalize().unique()
-            date_container = []
-            metric_container = {}
-            metric_container['datetime'] = []
-            for function in array:
-                metric_container[function.__name__] = []
-
-            for day in unique_days:
-                hour = day
-
-                for hr in range(23):
-                    next_hour = hour + np.timedelta64(1, 'h')
-                    mask = ((self.df_time['Time'] > hour) & (self.df_time['Time'] <= next_hour))
-                    times = self.df_time.loc[mask]
-                    labs = self.df_label.loc[mask]
-
-                    if labs.size > 1:
-
-                        metric_container['datetime'].append(hour)
-
-                        times = times.astype(np.int64) // 10 ** 6
-                        times = times / 1000
-
-                        metric_holder = []
-                        for function in array:
-                            metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
-                            metric_container[function.__name__].append(metric_holder)
-
-                    hour = next_hour
-
-        elif self.duration == 86400:
-            unique_days = self.df_time['Time'].dt.normalize().unique()
-            date_container = []
-            metric_container = {}
-            metric_container['datetime'] = []
-            for function in array:
-                metric_container[function.__name__] = []
-
-            for day in unique_days:
-
-                next_day = day + np.timedelta64(1, 'D')
-                mask = ((self.df_time['Time'] > day) & (self.df_time['Time'] <= next_day))
-                times = self.df_time.loc[mask]
-                labs = self.df_label.loc[mask]
-
-                if labs.size > 1:
-                    metric_container['datetime'].append(day)
-
-                    times = times.astype(np.int64) // 10 ** 6
-                    times = times / 1000
-
-                    metric_holder = []
-                    for function in array:
-                        metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
-                        metric_container[function.__name__].append(metric_holder)
+        metric_container, date_container = self.run_metric_array(array)
 
         csv_out = pd.DataFrame(metric_container)
         csv_out.to_csv(self.csv)
