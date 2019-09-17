@@ -1,5 +1,10 @@
 # Virtual environment
 /venv/
 
+# Datasets
+/data/
+
 # Auxiliar Python files
 *.pyc
+# Swap files
+*.swp
