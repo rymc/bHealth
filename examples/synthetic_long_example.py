@@ -215,6 +215,7 @@ if __name__ == '__main__':
     generate_visualisations(clf_grid.best_estimator_, X, y, ts, labels, features)
 
     metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'hourly')
-    plot_metrics(metric_container_daily, date_container_daily, labels_=labels)
+    figures_dict = plot_metrics(metric_container_daily, date_container_daily, labels_=labels)
 
-    plt.savefig(__file__.strip('.py'))
+    for key, fig in figures_dict.items():
+        fig.savefig(os.path.join('./output/', key))

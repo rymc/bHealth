@@ -55,7 +55,8 @@ def get_raw_ts_X_y():
                               + [-0.5, 0.5, 0]
                      ]
 
-    labels = [0, 1, 2, 3, 4, 5]
+    labels = ['eating', 'sitting', 'walking', 'studying', 'sleeping', 'washing'
+             ]
     rts = RandomTimeSeries(generator_list, labels=labels,
                            priors=[3, 4, 2, 1, 1, 1], samplesize='1Min')
 
@@ -176,6 +177,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
 def activity_metrics(labels, timestamps, span):
     """Outputs typical activity metrics."""
 
+    # TODO use the labels returned by get_raw_ts_X_y
     descriptor_map = {
         'eating': 0,
         'sitting': 1,
@@ -219,6 +221,7 @@ if __name__ == '__main__':
     print_summary(clf_grid, X_test, y_test)
 
     metric_container_daily, date_container_daily = activity_metrics(y, ts, 'hourly')
-    plot_metrics(metric_container_daily, date_container_daily)
+    figures_dict = plot_metrics(metric_container_daily, date_container_daily)
 
-    plt.savefig(__file__.strip('.py'))
+    for key, fig in figures_dict.items():
+        fig.savefig(os.path.join('./output/', key))
