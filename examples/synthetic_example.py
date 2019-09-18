@@ -1,35 +1,26 @@
 import sys
-sys.path.append('../')
-
 import os
 import pandas as pd
 import numpy as np
-from scipy import stats
-
-from glob import glob
-
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import numpy.ma as ma
-
-from datetime import datetime, timedelta
-
-from bhealth.visualisations import plot_metrics
-from bhealth.visualisations import features_figure
-from bhealth.visualisations import plot_test_train_splits
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import StratifiedKFold
 
+from datetime import timedelta
+
+sys.path.append('../')
 from bhealth.synthetic import RandomTimeSeries
-#from synthetic import RandomTimeSeries
+from bhealth.visualisations import plot_metrics
+from bhealth.visualisations import features_figure
+from bhealth.visualisations import plot_test_train_splits
+from bhealth.visualisations import polar_labels_figure
 from bhealth.metric_wrappers import Wrapper
+
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 np.random.seed(42)
 
@@ -38,7 +29,7 @@ def get_raw_ts_X_y():
         return np.sin(np.repeat(np.arange(n_samples), size).reshape(n_samples, size)
                         ) + np.random.randn(n_samples, size)
 
-    n_features = 7
+    n_features = 3
     features = ['Acceleration X', 'Acceleration Y', 'Acceleration Z']
     # First example
     generator_list = [lambda: np.random.randn(np.random.randint(1, 100), 3)/2

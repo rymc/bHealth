@@ -1,33 +1,26 @@
 import sys
-sys.path.append('../')
-
 import os
 import pandas as pd
 import numpy as np
-from scipy import stats
 
-from glob import glob
-
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import numpy.ma as ma
-
-from datetime import datetime, timedelta
-from bhealth.visualisations import plot_metrics
-from bhealth.visualisations import features_figure
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import StratifiedKFold
-from bhealth.visualisations import plot_test_train_splits
 
+from datetime import timedelta
+
+sys.path.append('../')
 from bhealth.synthetic import RandomTimeSeries
+from bhealth.visualisations import plot_metrics
+from bhealth.visualisations import features_figure
+from bhealth.visualisations import plot_test_train_splits
+from bhealth.visualisations import polar_labels_figure
 from bhealth.metric_wrappers import Wrapper
 
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 np.random.seed(42)
 
@@ -117,7 +110,6 @@ def print_summary(clf_grid, X_test, y_test):
 def generate_visualisations(clf, X, y, ts, labels, features):
     y_pred = clf.predict(X)
     # Ongoing example of polar plot
-    from bhealth.visualisations import polar_labels_figure
     def most_common(x):
         if len(x) == 0:
             return -1
