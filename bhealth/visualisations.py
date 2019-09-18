@@ -343,7 +343,6 @@ def features_figure(X, ts=None, feature_names=None, fig=None, ax=None,
     plt.gcf().autofmt_xdate()
     ax.grid(b=True)
     ax.set_axisbelow(True)
-    fig.show()
 
     return fig, ax
 
@@ -481,22 +480,22 @@ def labels_figure(y_array, ts=None, labels=None, fig=None, ax=None,
         ax = fig.add_subplot()
 
     if labels is None:
-        labels = numpy.arrange(numpy.unique(y_array))
+        labels = np.arrange(np.unique(y_array))
 
     if ts is None:
-        ts = numpy.arange(len(y_array))
+        ts = np.arange(len(y_array))
 
     norm = mpl.colors.Normalize(vmin=0, vmax=len(labels))
     cmap = cm.gist_rainbow
     m = cm.ScalarMappable(norm=norm, cmap=cmap)
-    y_change = numpy.where(y_array != numpy.roll(y_array, 1))[0]
+    y_change = np.where(y_array != np.roll(y_array, 1))[0]
 
     # First label needs to be added manually
     if len(y_change) > 0:
         y = y_array[0]
         interval = (ts[0], ts[y_change[1]-1])
-        line_xs = numpy.array(interval)
-        line_ys = numpy.array((y, y))
+        line_xs = np.array(interval)
+        line_ys = np.array((y, y))
         ax.fill_between(line_xs, line_ys-0.5, line_ys+0.5,
                         facecolor=m.to_rgba(y), edgecolor='dimgray',
                         linewidth=0.2)
@@ -509,8 +508,8 @@ def labels_figure(y_array, ts=None, labels=None, fig=None, ax=None,
             y = y_array[change_id]
             interval = (ts[change_id],
                         ts[y_change[i+1]])
-        line_xs = numpy.array(interval)
-        line_ys = numpy.array((y, y))
+        line_xs = np.array(interval)
+        line_ys = np.array((y, y))
         ax.fill_between(line_xs, line_ys-0.5, line_ys+0.5,
                         facecolor=m.to_rgba(y), edgecolor='dimgray',
                         linewidth=0.2)
@@ -601,7 +600,7 @@ def polar_labels_figure(labels, label_names, xticklabels, empty_rows=0,
         ax = fig.add_axes([0, 0, 1.0, 0.9], polar=True)
 
     if labels is None:
-        labels = numpy.arrange(numpy.unique(y_array))
+        labels = np.arrange(np.unique(y_array))
 
     n_rows = labels.shape[0] + empty_rows
     n_columns = labels.shape[1]
@@ -619,16 +618,16 @@ def polar_labels_figure(labels, label_names, xticklabels, empty_rows=0,
             colors = cm.ScalarMappable(norm=norm, cmap=cmap)
             m = colors.to_rgba
 
-    width = 2 * numpy.pi / n_columns # All boxes are the same width
-    indices = numpy.arange(len(labels)) + leading_labels + empty_rows*n_columns
-    x = indices * 2 * numpy.pi / n_columns
+    width = 2 * np.pi / n_columns # All boxes are the same width
+    indices = np.arange(len(labels)) + leading_labels + empty_rows*n_columns
+    x = indices * 2 * np.pi / n_columns
     bottom = indices / n_columns
     if not spiral:
         bottom = bottom.astype(int)
     colors = [m(y) if y!= -1 else 'white' for y in labels]
     ax.bar(x, height=1, width=width, bottom=bottom, align='edge', color=colors)
     #for i, y in enumerate(labels):
-    #    x = i * 2 * numpy.pi / n_columns
+    #    x = i * 2 * np.pi / n_columns
     #    bottom = i / n_columns
     #    if not spiral:
     #        bottom = int(bottom)
@@ -640,12 +639,12 @@ def polar_labels_figure(labels, label_names, xticklabels, empty_rows=0,
         plt.ylim(0,n_rows)
     ax.set_yticks([])
 
-    ax.set_xticks(2 * numpy.pi * numpy.arange(len(xticklabels)) /
+    ax.set_xticks(2 * np.pi * np.arange(len(xticklabels)) /
                   len(xticklabels))
     ax.set_xticklabels(xticklabels)
 
     ax.set_theta_direction(-1)
-    ax.set_theta_offset(numpy.pi/2.0)
+    ax.set_theta_offset(np.pi/2.0)
     handles = [mpatches.Patch(color=m(i), label=y) for i, y in
                enumerate(label_names)]
     ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(-0.2, 1.1),

@@ -18,7 +18,6 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import StratifiedKFold
 
 import matplotlib.pyplot as plt
 
@@ -83,7 +82,7 @@ def get_classifier_grid():
                            models[classifier_name]['parameters'].items()}
 
     clf_grid = GridSearchCV(pipeline, param_grid=pipeline_parameters, cv=cv,
-                            refit=True)
+                            refit=True, iid=True)
     return clf_grid
 
 
@@ -110,7 +109,11 @@ def localisation_metrics(labels, timestamps, span):
                  [3, 6, 0, 4],
                  [3.3, 1.5, 4, 0]]
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency=adjecency)
+    if not os.path.exists('./output/'):
+        os.mkdir('./output/')
+
+    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
+                      adjecency=adjecency)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
@@ -130,9 +133,6 @@ if __name__ == '__main__':
     for house_ in houses:
 
         ts, X, y = get_raw_ts_X_y(house_)
-        features_figure(X, feature_names=['AP1', 'AP2', 'AP3', 'AP4', 'AP5',
-                                          'AP6', 'AP7', 'AP8'])
-
         X, y = preprocess_X_y(ts, X, y)
         (X_train, y_train), (X_test, y_test) = split_train_test(X, y)
         clf_grid = get_classifier_grid()
@@ -147,6 +147,11 @@ if __name__ == '__main__':
                                                                      'bedroom',
                                                                      'living_room',
                                                                      'bathroom'])
+
+        fig, ax = features_figure(X, feature_names=['AP1', 'AP2', 'AP3', 'AP4',
+                                                    'AP5', 'AP6', 'AP7',
+                                                    'AP8'])
+        figures_dict['features'] = fig
 
         for key, fig in figures_dict.items():
             print(key)
