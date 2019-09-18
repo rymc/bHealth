@@ -182,7 +182,6 @@ def activity_metrics(labels, timestamps, span):
         os.mkdir('./output/')
 
     metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
-                      csv_prep=r'./output/activity_metrics.csv',
                       adjecency=None)
 
     df_time = timestamps.astype('datetime64')

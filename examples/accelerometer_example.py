@@ -93,7 +93,8 @@ def get_classifier_grid():
     clf = RandomForestClassifier()
     param_grid = {'n_estimators' : [200, 250],
                   'min_samples_leaf': [5, 10]}
-    clf_grid = GridSearchCV(clf, param_grid=param_grid, cv=cv, refit=True)
+    clf_grid = GridSearchCV(clf, param_grid=param_grid, cv=cv, refit=True,
+                            iid=True)
     return clf_grid
 
 
@@ -123,7 +124,6 @@ def activity_metrics(labels, timestamps, span):
         os.mkdir('./output/')
 
     metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
-                      csv_prep=r'./output/activity_metrics.csv',
                       adjecency=None)
 
     df_time = timestamps.astype('datetime64')

@@ -119,9 +119,9 @@ def localisation_metrics(labels, timestamps, span):
     df_time = pd.DataFrame(df_time, columns=['Time'])
     df_label = pd.DataFrame(labels, columns=['Label'])
 
-    metric_array= [ metrics.walking_speed,
-                    metrics.room_transfers,
-                    metrics.number_of_unique_locations]
+    metric_array= [metrics.walking_speed,
+                   metrics.room_transfers,
+                   metrics.number_of_unique_locations]
 
     metric_container, date_container = metrics.run_metric_array(metric_array)
 
@@ -154,5 +154,4 @@ if __name__ == '__main__':
         figures_dict['features'] = fig
 
         for key, fig in figures_dict.items():
-            print(key)
             fig.savefig(os.path.join('./output/', key))

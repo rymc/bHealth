@@ -173,7 +173,7 @@ def localisation_metrics(labels, timestamps, span):
         os.mkdir('./output/')
 
     metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
-                      csv_prep=r'./output/localisation_metrics.csv',
+                      # csv_prep=r'./output/localisation_metrics.csv',
                       adjecency=adjecency)
 
     df_time = timestamps.astype('datetime64')
