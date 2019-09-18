@@ -11,8 +11,9 @@ from bhealth.metrics import Metrics
 
 class Wrapper:
     """
-    Wrapper class is instantiated before calling the metrics. The metrics are contained in an array, which is subsequently
-    iterated. The outcomes of the iterations are then held inside containers.
+    Wrapper class is instantiated before calling the metrics. The metrics are
+    contained in an array, which is subsequently iterated. The outcomes of the
+    iterations are then held inside containers.
 
     If you want to add your own specific metric function, do it here.
     """
@@ -203,25 +204,25 @@ class Wrapper:
         return container
 
     def duration_walking(self, *args):
-        return self.duration_activity(self, *args, activity='walking')
+        return self.duration_activity(*args, activity='walking')
 
     def duration_sitting(self, *args):
-        return self.duration_activity(self, *args, activity='sitting')
+        return self.duration_activity(*args, activity='sitting')
 
     def duration_sleeping(self, *args):
-        return self.duration_activity(self, *args, activity='sleeping')
+        return self.duration_activity(*args, activity='sleeping')
 
     def duration_washing(self, *args):
-        return self.duration_activity(self, *args, activity='washing')
+        return self.duration_activity(*args, activity='washing')
 
     def duration_eating(self, *args):
-        return self.duration_activity(self, *args, activity='eating')
+        return self.duration_activity(*args, activity='eating')
 
     def duration_studying(self, *args):
-        return self.duration_activity(self, *args, activity='studying')
+        return self.duration_activity(*args, activity='studying')
 
     def duration_in_location(self, labels, timestamps, timespan, overlap, fs,
-                          location):
+                             location):
         """
         Wrapper to output the duration studying.
 
