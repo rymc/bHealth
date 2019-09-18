@@ -1,3 +1,6 @@
-sphinx
-sphinx-gallery
-numpydoc
+numpy
+sklearn
+pandas
+pymongo
+matplotlib
+seaborn
