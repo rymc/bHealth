@@ -8,3 +8,10 @@
 *.pyc
 # Swap files
 *.swp
+
+# Figures
+*.png
+*.svg
+
+# Output of example scripts
+/examples/output/
