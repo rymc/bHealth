@@ -62,10 +62,24 @@ script __run\_tests.sh__
 
 ## Examples
 
-In order to run the examples you will need to run the following commands to download a dataset[1] and place the files in the required directory. 
+In order to run the examples you will need to run the following commands to download a dataset[1] and place the files in the required directory.
 ```
 cd scripts
 bash download-rssi-acc.sh
 ```
+
+## Tutorial (Jupyter notebooks)
+
+In order to run the Jupyter notebooks with the correct dependencies it is
+necessary to create a new kernel that can be loaded from the Jupyter notebook
+session. You can create a new kernel following the next steps:
+
+```
+source venv/bin/activate
+pip install ipykernel
+ipython kernel install --user --name=bhealth
+```
+
+This creates a new kernel called __bhealth__
 
 [1] Byrne D, Kozlowski M, Santos-Rodriguez R, Piechocki R, Craddock I. Residential wearable RSSI and accelerometer measurements with detailed location annotations. Scientific data. 2018 Aug 21;5:180168.
