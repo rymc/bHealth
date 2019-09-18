@@ -18,7 +18,8 @@ class Wrapper:
     If you want to add your own specific metric function, do it here.
     """
 
-    def __init__(self, labels, timestamps, duration, overlap, fs, label_descriptor_map, csv_prep=None, adjecency=None):
+    def __init__(self, labels, timestamps, duration, overlap, fs,
+                 label_descriptor_map, csv_prep=None, adjecency=None):
         """
         Wrapper to output the average walking speed.
 
@@ -528,46 +529,6 @@ class Wrapper:
         return returner_
 
     def label_mappings(self, container, is_duration, label_to_extract=None):
-
-        # if house_ == 'A' or house_ == 0:
-        #
-        #     descriptor_map = {
-        #         77: 'cooking',
-        #         78: 'sitting',
-        #         79: 'sitting',
-        #         80: 'washing',
-        #         81: 'sleeping',
-        #         82: 'sitting'}
-        #
-        # elif house_ == 'B' or house_ == 1:
-        #
-        #     descriptor_map = {
-        #         77: 'cooking',
-        #         78: 'washing',
-        #         79: 'sitting',
-        #         80: 'sitting',
-        #         81: 'sleeping',
-        #         82: 'sleeping'}
-        #
-        # elif house_ == 'C' or house_ == 2:
-        #
-        #     descriptor_map = {
-        #         77: 'sitting',
-        #         78: 'cooking',
-        #         79: 'washing',
-        #         80: 'sitting',
-        #         81: 'sleeping',
-        #         82: 'sitting'}
-        #
-        # elif house_ == 'D' or house_ == 3:
-        #
-        #     descriptor_map = {
-        #         77: 'washing',
-        #         78: 'sleeping',
-        #         79: 'sitting',
-        #         80: 'sitting',
-        #         81: 'sleeping',
-        #         82: 'cooking'}
         container_ = []
 
         if self.csv is not None:
