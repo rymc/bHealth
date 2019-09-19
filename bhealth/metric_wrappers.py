@@ -61,25 +61,28 @@ class Wrapper:
             self.duration = 60*60
 
 
-    def run_metric_array(self, array):
+    def run_metric_array(self, metrics_list):
         """
         Function to run the metric arrays
 
         Parameters
         ----------
-        array
-            Vector of metric functions to run.
+        metrics_list
+            List of metric functions to run.
 
         Returns
         -------
         metric container
             Container holding the metrics outlined in 'array' parameter. This
             is indexed by each metric in sequence, followed by the output.
+        date_container
+            List of numpy.datetime64 with hourly or daily intervals that
+            contain more than 1 labels for every day in self.df_time
         """
         unique_days = self.df_time['Time'].dt.normalize().unique()
         date_container = []
         metric_container = {}
-        for function in array:
+        for function in metrics_list:
             metric_container[function.__name__] = []
 
 
@@ -97,22 +100,23 @@ class Wrapper:
                 mask = ((self.df_time['Time'] > current_time) &
                         (self.df_time['Time'] <= next_time))
                 times = self.df_time.loc[mask]
-                labs = self.df_label.loc[mask]
+                labels = self.df_label.loc[mask]
 
-                if labs.size > 1:
+                if labels.size > 1:
 
                     date_container.append(current_time)
 
                     times = times.astype(np.int64) // 10 ** 6
                     times = times / 1000
 
-                    metric_holder = []
-                    for function in array:
-                        metric_holder = (np.apply_along_axis(function, 0, labs,
-                                                             times,
-                                                             self.duration,
-                                                             self.overlap,
-                                                             self.fs).tolist())
+                    for function in metrics_list:
+                        # TODO Check if we need to force a list instead of the
+                        # default numpy array
+                        metric_holder = np.apply_along_axis(function, 0,
+                                                            labels, times,
+                                                            self.duration,
+                                                            self.overlap,
+                                                            self.fs).tolist()
                         metric_container[function.__name__].append(metric_holder)
 
                 current_time = next_time
@@ -379,6 +383,9 @@ class Wrapper:
         """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.speed(labels, timestamps, self.adjecency)
+        # TODO Why do we want the absolute values for speed, and these seem not
+        # to be applied to the specified window, instead it is the raw values
+        # after the apply metrics is called
         return np.abs(container), np.nanmean(np.abs(container)), np.nanmax(np.abs(container))
 
     # def time_between_upstairs_downstairs(self, labels, timestamps, timespan, overlap, fs=None):
