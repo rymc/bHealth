@@ -3,3 +3,4 @@ sklearn
 pandas
 pymongo
 matplotlib
+seaborn
