@@ -29,14 +29,16 @@ class Wrapper:
            Vector of labels.
         timestamps
            Vector of timestamps.
-        duration
-           Duration of metric calculation. Either 86400 (daily) or 3600 (hourly)
+        duration string (daily, hourly)
+           Duration of metric calculation. Either 86400 (daily) or 3600
+           (hourly)
         overlap
            Amount of overlap for the calculation of the transfers.
         fs
            Sampling frequency.
         adjecency
-            NxN binary matrix of state adjecency, where 1 specifies that two states are adjecent
+            NxN binary matrix of state adjecency, where 1 specifies that two
+            states are adjecent
         label_descriptor_map
             Map of numerical to categorical labels.
         """
@@ -54,9 +56,9 @@ class Wrapper:
         self.df_label = pd.DataFrame(self.labels, columns=['Label'])
 
         if duration == 'daily':
-            self.duration = 86400
+            self.duration = 24*60*60
         elif duration == 'hourly':
-            self.duration = 3600
+            self.duration = 60*60
 
 
     def run_metric_array(self, array):
@@ -80,48 +82,41 @@ class Wrapper:
         for function in array:
             metric_container[function.__name__] = []
 
+
         if self.duration == 60*60:
-            for day in unique_days:
-                hour = day
-
-                for hr in range(23):
-                    next_hour = hour + np.timedelta64(1, 'h')
-                    mask = ((self.df_time['Time'] > hour) & (self.df_time['Time'] <= next_hour))
-                    times = self.df_time.loc[mask]
-                    labs = self.df_label.loc[mask]
-
-                    if labs.size > 1:
-
-                        date_container.append(hour)
-
-                        times = times.astype(np.int64) // 10 ** 6
-                        times = times / 1000
-
-                        metric_holder = []
-                        for function in array:
-                            metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
-                            metric_container[function.__name__].append(metric_holder)
-
-                    hour = next_hour
-
+            timedelta = np.timedelta64(1, 'h')
         elif self.duration == 60*60*24:
-            for day in unique_days:
+            timedelta = np.timedelta64(1, 'D')
 
-                next_day = day + np.timedelta64(1, 'D')
-                mask = ((self.df_time['Time'] > day) & (self.df_time['Time'] <= next_day))
+        for day in unique_days:
+            current_time = day
+            next_day = day + np.timedelta64(1, 'D')
+
+            next_time = current_time + timedelta
+            while next_time <= next_day:
+                mask = ((self.df_time['Time'] > current_time) &
+                        (self.df_time['Time'] <= next_time))
                 times = self.df_time.loc[mask]
                 labs = self.df_label.loc[mask]
 
                 if labs.size > 1:
-                    date_container.append(day)
+
+                    date_container.append(current_time)
 
                     times = times.astype(np.int64) // 10 ** 6
                     times = times / 1000
 
                     metric_holder = []
                     for function in array:
-                        metric_holder = (np.apply_along_axis(function, 0, labs, times, self.duration, self.overlap, self.fs).tolist())
+                        metric_holder = (np.apply_along_axis(function, 0, labs,
+                                                             times,
+                                                             self.duration,
+                                                             self.overlap,
+                                                             self.fs).tolist())
                         metric_container[function.__name__].append(metric_holder)
+
+                current_time = next_time
+                next_time = current_time + timedelta
 
         return metric_container, date_container
 
@@ -142,6 +137,8 @@ class Wrapper:
         """
         metric_container, date_container = self.run_metric_array(array)
 
+        # TODO find out if the dictonaries in the metric_container are
+        # necessary
         csv_out = pd.DataFrame(metric_container)
         csv_out.to_csv(self.csv)
 
@@ -201,7 +198,7 @@ class Wrapper:
         """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 1, activity)
+        container = self.label_mappings(container, True, activity)
         return container
 
     def duration_walking(self, *args):
@@ -327,7 +324,7 @@ class Wrapper:
 
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings(container, 0)
+        container = self.label_mappings(container, False)
         return container
 
     def number_of_unique_locations(self, labels, timestamps, timespan, overlap, fs):
@@ -511,39 +508,26 @@ class Wrapper:
             for key in self.label_descriptor_map:
                 for id, label in enumerate(container):
                     if int(label[0]) in self.label_descriptor_map[key]:
-                        if self.csv is not None:
-                            returner_.append(label[1])
-                        else:
-                            returner_.update({key : label[1]})
+                        returner_.update({key : label[1]})
         else:
             for id, label in enumerate(container):
                 if int(label[0]) in self.label_descriptor_map[label_to_extract]:
                     container_.append(label[1])
 
             container_ = np.sum(container_)
-            if self.csv is not None:
-                returner_ = container_
-            else:
-                returner_ = {label_to_extract : container_}
+            returner_ = {label_to_extract : container_}
 
         return returner_
 
-    def label_mappings(self, container, is_duration, label_to_extract=None):
+    def label_mappings(self, container, is_duration=False, label_to_extract=None):
         container_ = []
-
-        if self.csv is not None:
-            returner_ = []
-        else:
-            returner_ = {}
+        returner_ = {}
 
         if label_to_extract is None:
             for key in self.label_descriptor_map:
                 for id, label in enumerate(container):
                     if int(label[0]) == self.label_descriptor_map[key]:
-                        if self.csv is not None:
-                            returner_.append(label[1])
-                        else:
-                            returner_.update({key : label[1]})
+                        returner_.update({key : label[1]})
         else:
             for id, label in enumerate(container):
                 if int(label[0]) == self.label_descriptor_map[label_to_extract]:
@@ -551,9 +535,6 @@ class Wrapper:
 
             if is_duration:
                 container_ = np.sum(container_)
-                if self.csv is not None:
-                    returner_ = container_
-                else:
-                    returner_ = {label_to_extract : container_}
+                returner_ = {label_to_extract : container_}
 
         return returner_
