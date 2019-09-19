@@ -181,7 +181,8 @@ def activity_metrics(labels, timestamps, span):
     if not os.path.exists('./output/'):
         os.mkdir('./output/')
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
+    metrics = Wrapper(labels, timestamps, duration=span, overlap=1, fs=25,
+                      label_descriptor_map=descriptor_map,
                       adjecency=None)
 
     df_time = timestamps.astype('datetime64')
@@ -193,7 +194,8 @@ def activity_metrics(labels, timestamps, span):
                     metrics.duration_washing,
                     metrics.duration_eating,
                     metrics.duration_sleeping,
-                    metrics.duration_studying]
+                    metrics.duration_studying,
+                    metrics.number_of_unique_activities]
 
     metric_container, date_container = metrics.run_metric_array_csv(metric_array)
 
@@ -202,16 +204,19 @@ def activity_metrics(labels, timestamps, span):
 if __name__ == '__main__':
     ts, X, y, labels, features = get_raw_ts_X_y()
 
-    features_figure(X[0:X.size:50], ts[0:ts.size:50], feature_names=['X', 'Y', 'Z'])
-
     ts, X, y = preprocess_X_y(ts, X, y)
     (ts_train, X_train, y_train), (ts_test, X_test, y_test) = split_train_test(ts, X, y)
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
 
-    metric_container_daily, date_container_daily = activity_metrics(y, ts, 'hourly')
+    metric_container_daily, date_container_daily = activity_metrics(y, ts,
+                                                                    'daily')
     figures_dict = plot_metrics(metric_container_daily, date_container_daily)
+
+    fig, ax = features_figure(X[0:X.size:50], ts[0:ts.size:50],
+                              feature_names=['X', 'Y', 'Z'])
+    figures_dict['features'] = fig
 
     for key, fig in figures_dict.items():
         fig.savefig(os.path.join('./output/', key))
