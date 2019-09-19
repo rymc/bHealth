@@ -231,7 +231,7 @@ def plot_metrics(metrics, date, labels_=None):
         #                fontsize=9, framealpha=0.7)
         #     plt.title('specific_' + ' ' + str(date_))
 
-        return figures_dict
+    return figures_dict
 
 def plot_features(X, ts=None, feature_names=None, xlab=None, ylab=None):
     """
