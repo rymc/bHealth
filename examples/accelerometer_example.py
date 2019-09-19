@@ -138,7 +138,8 @@ def activity_metrics(labels, timestamps, span):
                    metrics.duration_studying,
                    metrics.number_of_unique_activities]
 
-    metric_container, date_container = metrics.run_metric_array(metric_array)
+    metric_container, date_container = metrics.run_metric_array(
+        metric_array, csv='./output/accelerometer_metrics.csv')
 
     return metric_container, date_container
 

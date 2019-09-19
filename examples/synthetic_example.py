@@ -197,7 +197,8 @@ def activity_metrics(labels, timestamps, span):
                     metrics.duration_studying,
                     metrics.number_of_unique_activities]
 
-    metric_container, date_container = metrics.run_metric_array_csv(metric_array)
+    metric_container, date_container = metrics.run_metric_array(
+        metric_array, csv='./output/synthetic_metrics.csv')
 
     return metric_container, date_container
 
@@ -219,4 +220,5 @@ if __name__ == '__main__':
     figures_dict['features'] = fig
 
     for key, fig in figures_dict.items():
+        fig.tight_layout()
         fig.savefig(os.path.join('./output/', key))

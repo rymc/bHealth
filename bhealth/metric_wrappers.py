@@ -60,8 +60,11 @@ class Wrapper:
         elif duration == 'hourly':
             self.duration = 60*60
 
+        if csv_prep is not None:
+            print('''Warning: The parameter csv_prep will be deprecated''')
 
-    def run_metric_array(self, metrics_list):
+
+    def run_metric_array(self, metrics_list, csv=None):
         """
         Function to run the metric arrays
 
@@ -122,6 +125,10 @@ class Wrapper:
                 current_time = next_time
                 next_time = current_time + timedelta
 
+        if csv is not None:
+            csv_out = pd.DataFrame(metric_container)
+            csv_out.to_csv(csv)
+
         return metric_container, date_container
 
     def run_metric_array_csv(self, array):
@@ -139,14 +146,10 @@ class Wrapper:
             Container holding the metrics outlined in 'array' parameter. This
             is indexed by each metric in sequence, followed by the output.
         """
-        metric_container, date_container = self.run_metric_array(array)
-
-        # TODO find out if the dictonaries in the metric_container are
-        # necessary
-        csv_out = pd.DataFrame(metric_container)
-        csv_out.to_csv(self.csv)
-
-        return metric_container, date_container
+        print('''Warning: function run_metric_array_csv is being deprecated,
+               you should use run_metric_array specifying the csv filename as
+               an argument''')
+        return self.run_metric_array(array, csv=self.csv)
 
     def room_transfers(self, labels, timestamps, timespan, overlap, fs):
         """

@@ -123,7 +123,8 @@ def localisation_metrics(labels, timestamps, span):
                    metrics.room_transfers,
                    metrics.number_of_unique_locations]
 
-    metric_container, date_container = metrics.run_metric_array(metric_array)
+    metric_container, date_container = metrics.run_metric_array(
+        metric_array, csv='./output/localisation.csv')
 
     return metric_container, date_container
 

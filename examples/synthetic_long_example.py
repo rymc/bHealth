@@ -136,7 +136,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     n_columns *= 7
     xticklabels = ('Mon 00:00', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
                    'Sun')
-    filename = 'labels_weekly.png'
+    filename = './output/labels_weekly.png'
 
     # Add carrying -1 (denoting NaNs)
     y_labels = df_labels['label'].values
@@ -172,21 +172,25 @@ def localisation_metrics(labels, timestamps, span):
     if not os.path.exists('./output/'):
         os.mkdir('./output/')
 
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map,
-                      # csv_prep=r'./output/localisation_metrics.csv',
+    metrics = Wrapper(labels, timestamps, duration=span, overlap=1, fs=25,
+                      label_descriptor_map=descriptor_map,
                       adjecency=adjecency)
 
     df_time = timestamps.astype('datetime64')
     df_time = pd.DataFrame(df_time, columns=['Time'])
     df_label = pd.DataFrame(labels, columns=['Label'])
 
-    metric_array= [ metrics.duration_in_bathroom,
-                    metrics.duration_in_bedroom_1,
-                    metrics.duration_in_bedroom_2,
-                    metrics.duration_in_kitchen,
-                    metrics.duration_in_living_room]
+    metric_array= [metrics.duration_in_bathroom,
+                   metrics.duration_in_bedroom_1,
+                   metrics.duration_in_bedroom_2,
+                   metrics.duration_in_kitchen,
+                   metrics.duration_in_living_room,
+                   metrics.walking_speed,
+                   metrics.room_transfers,
+                   metrics.number_of_unique_locations]
 
-    metric_container, date_container = metrics.run_metric_array_csv(metric_array)
+    metric_container, date_container = metrics.run_metric_array(
+        metric_array, csv='./output/synthetic_long_metrics.csv')
 
     return metric_container, date_container
 
@@ -204,10 +208,13 @@ if __name__ == '__main__':
     clf_grid.fit(X_train, y_train)
     print_summary(clf_grid, X_test, y_test)
 
-    generate_visualisations(clf_grid.best_estimator_, X, y, ts, labels, features)
+    generate_visualisations(clf_grid.best_estimator_, X, y, ts, labels,
+                            features)
 
-    metric_container_daily, date_container_daily = localisation_metrics(y, ts, 'hourly')
-    figures_dict = plot_metrics(metric_container_daily, date_container_daily, labels_=labels)
+    metric_container_daily, date_container_daily = localisation_metrics(y, ts,
+                                                                        'daily')
+    figures_dict = plot_metrics(metric_container_daily, date_container_daily,
+                                labels_=labels)
 
     for key, fig in figures_dict.items():
-        fig.savefig(os.path.join('./output/', key))
+        fig.savefig(os.path.join('output', key))
