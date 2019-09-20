@@ -253,7 +253,7 @@ class Wrapper:
         """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings_localisation(container, location)
+        container = self.label_mappings(container, is_duration=False, label_to_extract=location)
         return container
 
     def duration_in_bathroom(self, *args):
@@ -296,7 +296,7 @@ class Wrapper:
         """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.number_of_label_changes_per_window(labels, timestamps)
-        container = self.label_mappings_localisation(container, location)
+        container = self.label_mappings(container, is_duration=False, label_to_extract=location)
         return container
 
     def number_of_bathroom_visits(self, *args):
@@ -358,7 +358,7 @@ class Wrapper:
         """
         metr = Metrics(timestamps, timespan, overlap, fs)
         container = metr.duration_of_labels_per_window(labels, timestamps)
-        container = self.label_mappings_localisation(container)
+        container = self.label_mappings(container, is_duration=False)
         return container
 
     def walking_speed(self, labels, timestamps, timespan, overlap, fs):
@@ -509,8 +509,7 @@ class Wrapper:
 
         return labels_
 
-    def label_mappings_localisation(self, container, label_to_extract=None):
-
+    def label_mappings(self, container, is_duration=False, label_to_extract=None):
         container_ = []
         returner_ = {}
 
@@ -522,25 +521,6 @@ class Wrapper:
         else:
             for id, label in enumerate(container):
                 if int(label[0]) in self.label_descriptor_map[label_to_extract]:
-                    container_.append(label[1])
-
-            container_ = np.sum(container_)
-            returner_ = {label_to_extract : container_}
-
-        return returner_
-
-    def label_mappings(self, container, is_duration=False, label_to_extract=None):
-        container_ = []
-        returner_ = {}
-
-        if label_to_extract is None:
-            for key in self.label_descriptor_map:
-                for id, label in enumerate(container):
-                    if int(label[0]) == self.label_descriptor_map[key]:
-                        returner_.update({key : label[1]})
-        else:
-            for id, label in enumerate(container):
-                if int(label[0]) == self.label_descriptor_map[label_to_extract]:
                     container_.append(label[1])
 
             if is_duration:
