@@ -112,12 +112,12 @@ def activity_metrics(labels, timestamps, span):
     """Outputs typical activity metrics."""
 
     descriptor_map = {
-                'sitting' : 77,
-                'walking' : 78,
-                'washing' : 79,
-                'eating'  : 80,
-                'sleeping': 81,
-                'studying': 82
+                'sitting' : [77],
+                'walking' : [78],
+                'washing' : [79],
+                'eating'  : [80],
+                'sleeping': [81],
+                'studying': [82]
             }
 
     if not os.path.exists('./output/'):

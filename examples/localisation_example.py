@@ -98,10 +98,10 @@ def localisation_metrics(labels, timestamps, span):
     """Outputs typical activity metrics."""
 
     descriptor_map = {
-        'foyer' : [0],
-        'bedroom' : [1],
-        'living_room' : [2],
-        'bathroom' : [3]
+        'foyer'         : [0],
+        'bedroom'       : [1],
+        'living_room'   : [2],
+        'bathroom'      : [3]
     }
 
     adjecency = [[0, 2.5, 3, 3.3],

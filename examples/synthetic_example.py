@@ -170,12 +170,12 @@ def activity_metrics(labels, timestamps, span):
 
     # TODO use the labels returned by get_raw_ts_X_y
     descriptor_map = {
-        'eating': 0,
-        'sitting': 1,
-        'walking': 2,
-        'studying': 3,
-        'sleeping': 4,
-        'washing': 5
+        'eating'    : [0],
+        'sitting'   : [1],
+        'walking'   : [2],
+        'studying'  : [3],
+        'sleeping'  : [4],
+        'washing'   : [5]
     }
 
     if not os.path.exists('./output/'):
