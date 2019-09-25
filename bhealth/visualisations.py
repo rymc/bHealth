@@ -172,11 +172,17 @@ def plot_metrics(metrics, date, labels_=None):
                 ylabs = labels_
 
                 if len(current_metrics_per_date) != 0:
-                    data_frame_ =  pd.DataFrame(np.squeeze(current_metrics_per_date))
+                    data_frame_ = pd.DataFrame(np.squeeze(current_metrics_per_date),
+                                 index=ylabs, columns=ylabs)
                     fig, ax = plt.subplots()
                     # TODO Rewrite not to use seaborn
-                    sn.heatmap(data_frame_, annot=True, xticklabels=xlabs,
-                               yticklabels=ylabs, ax=ax)
+                    g = sn.heatmap(data_frame_, annot=True, ax=ax)
+                    g.set_yticklabels(g.get_yticklabels(), rotation = 0)
+                    ylim = list(ax.get_ylim())
+                    if ylim[1] == 0.5:
+                        ylim[0] += 0.5
+                        ylim[1] = 0
+                        ax.set_ylim(ylim)
                     title = metric + ' ' + str(date_)
                     ax.set_title(title)
                     figures_dict[title.replace(' ', '_')] = fig
