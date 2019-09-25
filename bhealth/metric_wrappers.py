@@ -265,6 +265,9 @@ class Wrapper:
     def duration_in_bedroom_2(self, *args):
         return self.duration_in_location(*args, location='bedroom 2')
 
+    def duration_in_hall(self, *args):
+        return self.duration_in_location(*args, location='hall')
+
     def duration_in_kitchen(self, *args):
         return self.duration_in_location(*args, location='kitchen')
 

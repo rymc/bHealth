@@ -47,9 +47,9 @@ def get_raw_ts_X_y():
 
     labels = ['bathroom', 'bedroom', 'hall', 'kitchen', 'living room']
     rts = RandomTimeSeries(generator_list, labels=labels,
-                           priors=[5, 2, 4, 3, 1], samplesize='1Min')
+                           priors=[5, 1, 4, 3, 5], samplesize='1Min')
 
-    ts, X, y = rts.generate('01-01-2019', '08-01-2019')
+    ts, X, y = rts.generate('07-01-2019', '14-01-2019')
 
     ts = ts.values
 
@@ -136,7 +136,7 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     n_columns *= 7
     xticklabels = ('Mon 00:00', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
                    'Sun')
-    filename = './output/labels_weekly.png'
+    filename = './output/synthetic_long_labels_weekly.png'
 
     # Add carrying -1 (denoting NaNs)
     y_labels = df_labels['label'].values
@@ -158,7 +158,7 @@ def localisation_metrics(labels, timestamps, span):
     descriptor_map = {
         'bathroom'      : [0],
         'bedroom 1'     : [1],
-        'bedroom 2'     : [2],
+        'hall'          : [2],
         'kitchen'       : [3],
         'living room'   : [4]
     }
@@ -182,7 +182,7 @@ def localisation_metrics(labels, timestamps, span):
 
     metric_array= [metrics.duration_in_bathroom,
                    metrics.duration_in_bedroom_1,
-                   metrics.duration_in_bedroom_2,
+                   metrics.duration_in_hall,
                    metrics.duration_in_kitchen,
                    metrics.duration_in_living_room,
                    metrics.walking_speed,
