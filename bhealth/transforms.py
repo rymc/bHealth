@@ -24,6 +24,8 @@ class Transforms:
         self.window_length = window_length
         self.current_position = 0
         self.window_overlap = window_overlap
+        # TODO Check that this step does not cause any other problems
+        self.step = window_length - window_overlap
 
     @staticmethod
     def zero_crossings(x):
@@ -55,6 +57,22 @@ class Transforms:
         return count_zc
 
     @staticmethod
+    def mean(x):
+        """
+        Return the mean.
+
+        Parameters
+        ----------
+        x
+            A window of data.
+
+        Returns
+        -------
+        mean
+        """
+        return np.mean(x)
+
+    @staticmethod
     def mean_crossings(x):
         """
         Return the number of mean crossings.
@@ -71,6 +89,23 @@ class Transforms:
         """
         x = x - np.mean(x)
         return Transforms.zero_crossings(x)
+
+    @staticmethod
+    def raw(x):
+        """
+        Return the number of mean crossings.
+
+        Parameters
+        ----------
+        x
+            A window of data.
+
+        Returns
+        -------
+        Transforms.zero_crossings(x)
+            Mean-crossing rate.
+        """
+        return x
 
     @staticmethod
     def interq(x):
@@ -217,7 +252,7 @@ class Transforms:
             Kurtosis of the signal
         """
         return scipy.stats.kurtosis(x, fisher=False, bias=True)
-    
+
     def _butter_lowpass(cutoff, fs, order=5):
         """
         Butterworth low pass filter. Internal function.
@@ -239,10 +274,10 @@ class Transforms:
             Denominator polynomial of the IIR filter.
         """
         nyq = 0.5 * fs
-        normal_cutoff = cutoff / nyq 
+        normal_cutoff = cutoff / nyq
         b, a = butter(order, normal_cutoff, btype='low', analog=False)
         return b, a
-    
+
     @staticmethod
     def butter_lowpass_filter(x, cutoff, fs, order=5):
         """
@@ -284,14 +319,15 @@ class Transforms:
         window
             Windowed data.
         """
-        window = x[self.current_position-self.window_length:self.current_position]
+        window = x[int(self.current_position-self.window_length):int(self.current_position)]
         if len(window) > 0:
             if len(window.shape) > 1:
                 window = window[~np.isnan(window).any(axis=1)]
             else:
                 window = window[~np.isnan(window)]
         if update:
-            self.current_position += self.window_overlap
+            # TODO Check that this does not break anything
+            self.current_position += self.step
         return window
 
     def feature_selection(self, X, y, method):
