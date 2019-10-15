@@ -45,14 +45,14 @@ from sklearn.metrics import brier_score_loss
 from sklearn.feature_selection import SelectFromModel
 
 sys.path.append('../')
-from digihealth.visualisations import plot_metrics
-from digihealth.visualisations import features_figure
-from digihealth.visualisations import plot_features
-from digihealth.visualisations import plot_test_train_splits
-from digihealth import data_loading
-from digihealth.transforms import Transforms
-from digihealth.metrics import Metrics
-from digihealth.metric_wrappers import Wrapper
+from bhealth.visualisations import plot_metrics
+from bhealth.visualisations import features_figure
+from bhealth.visualisations import plot_features
+from bhealth.visualisations import plot_test_train_splits
+from bhealth import data_loading
+from bhealth.transforms import Transforms
+from bhealth.metrics import Metrics
+from bhealth.metric_wrappers import Wrapper
 
 import scipy.stats
 from scipy.signal import butter, filtfilt
@@ -202,7 +202,7 @@ def get_raw_ts_X_y():
     column_names            
     
     # Load the training and testing data 
-    train_x, train_y = load_sequences([1, 2, 3, 4, 5])
+    train_x, train_y = load_sequences([1])
     
     # We will want to impute the missing data 
     imputer = Imputer()
@@ -338,37 +338,6 @@ def print_summary(clf_grid, X_test, y_test):
     tt_score = clf_grid.score(X_test, y_test)
     print("Train / test split accuracy "+str(tt_score))
 
-
-def activity_metrics(labels, timestamps, span):
-    """Outputs typical activity metrics."""
-
-    descriptor_map = {
-                'sitting' : 77,
-                'walking' : 78,
-                'washing' : 79,
-                'eating'  : 80,
-                'sleeping': 81,
-                'studying': 82
-            }
-
-    metrics = Wrapper(labels, timestamps, span, 1, 25, descriptor_map, adjecency=None)
-
-    df_time = timestamps.astype('datetime64')
-    df_time = pd.DataFrame(df_time, columns=['Time'])
-    df_label = pd.DataFrame(labels, columns=['Label'])
-
-    metric_array= [metrics.duration_sitting,
-                   metrics.duration_walking,
-                   metrics.duration_washing,
-                   metrics.duration_eating,
-                   metrics.duration_sleeping,
-                   metrics.duration_studying,
-                   metrics.number_of_unique_activities]
-
-    metric_container, date_container = metrics.run_metric_array(metric_array)
-    return metric_container, date_container
-
-
 def brier_score(given, predicted, weight_vector): 
     return np.power(given - predicted, 2.0).dot(weight_vector).mean()
 
@@ -381,9 +350,9 @@ if __name__ == '__main__':
     y_prob = clf_grid.predict_proba(X_test)
     y_pred = np.argmax(y_prob, axis=1)    
     cfm = confusion_matrix(y_test, y_pred)    
-    class_weights = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
-    y_test_prob = np.zeros((y_test.shape[0], max(y_train)+1),np.float64) 
-    for idx in range(0, y_test.shape[0]):
-        y_test_prob[idx,y_test[idx]] = 1
-    bs = brier_score(y_test_prob, y_prob, class_weights)
+#    class_weights = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
+#    y_test_prob = np.zeros((y_test.shape[0], max(y_train)+1),np.float64) 
+#    for idx in range(0, y_test.shape[0]):
+#        y_test_prob[idx,y_test[idx]] = 1
+#    bs = brier_score(y_test_prob, y_prob, class_weights)
     print_summary(clf_grid, X_test, y_test)  
