@@ -67,7 +67,9 @@ def split_train_test(ts, X, y):
     train_index, test_index = skf.split(X, y).__next__()
     train = ts[train_index], X[train_index], y[train_index]
     test = ts[test_index], X[test_index], y[test_index]
-    plot_test_train_splits(y[train_index], y[test_index])
+# =============================================================================
+#     plot_test_train_splits(y[train_index], y[test_index])
+# =============================================================================
     return train, test
 
 
@@ -150,7 +152,9 @@ def generate_visualisations(clf, X, y, ts, labels, features):
     fig, ax = polar_labels_figure(y_labels, labels, xticklabels,
                                   empty_rows=4, leading_labels=0, spiral=True,
                                   title="{} per box".format(resample), m=None)
-    fig.savefig(filename, dpi=300)
+# =============================================================================
+#     fig.savefig(filename, dpi=300)
+# =============================================================================
 
 def localisation_metrics(labels, timestamps, span):
     """Outputs typical activity metrics."""
@@ -206,15 +210,24 @@ if __name__ == '__main__':
     (ts_train, X_train, y_train), (ts_test, X_test, y_test) = split_train_test(ts, X, y)
     clf_grid = get_classifier_grid()
     clf_grid.fit(X_train, y_train)
-    print_summary(clf_grid, X_test, y_test)
+# =============================================================================
+#     print_summary(clf_grid, X_test, y_test)
+# =============================================================================
 
-    generate_visualisations(clf_grid.best_estimator_, X, y, ts, labels,
-                            features)
+# =============================================================================
+#     generate_visualisations(
+#                 clf_grid.best_estimator_, 
+#                 X, y, ts, 
+#                 labels,
+#                 features)
+# =============================================================================
 
     metric_container_daily, date_container_daily = localisation_metrics(y, ts,
                                                                         'daily')
     figures_dict = plot_metrics(metric_container_daily, date_container_daily,
                                 labels_=labels)
 
-    for key, fig in figures_dict.items():
-        fig.savefig(os.path.join('output', key))
+# =============================================================================
+#     for key, fig in figures_dict.items():
+#         fig.savefig(os.path.join('output', key))
+# =============================================================================

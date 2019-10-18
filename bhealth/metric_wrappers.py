@@ -116,10 +116,12 @@ class Wrapper:
                         # TODO Check if we need to force a list instead of the
                         # default numpy array
                         metric_holder = np.apply_along_axis(function, 0,
-                                                            labels, times,
+                                                            labels,
+                                                            times,
                                                             self.duration,
                                                             self.overlap,
-                                                            self.fs).tolist()
+                                                            self.fs
+                                                            ).tolist()
                         metric_container[function.__name__].append(metric_holder)
 
                 current_time = next_time

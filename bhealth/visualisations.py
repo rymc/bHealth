@@ -25,6 +25,8 @@ def plot_test_train_splits(train, test):
     unique_labels_train, counts_train = np.unique(train, return_counts=True)
     unique_labels_test, counts_test = np.unique(test, return_counts=True)
 
+    print(counts_test)
+    print(counts_train)
     x = np.arange(len(unique_labels_train))  # the label locations
     width = 0.35
 

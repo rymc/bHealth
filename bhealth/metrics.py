@@ -183,7 +183,10 @@ class Metrics:
         label_time_array = np.zeros(len(labels))
 
         for idx in range(1, len(labels_)):
-            label_change_array[idx] += adjacency[int(np.where(unique_lab == labels_[idx-1])[0][0]), int(np.where(unique_lab == labels_[idx])[0][0])]
+            label_change_array[idx] += adjacency[
+                                        int(np.where(unique_lab == labels_[idx-1])[0][0]),
+                                        int(np.where(unique_lab == labels_[idx])[0][0])
+                                        ]
             label_time_array[idx] += np.abs(timestamps[idx - 1] - timestamps[idx])
 
         distances = np.divide(label_change_array, label_time_array)
@@ -312,4 +315,3 @@ class Metrics:
         if update:
             self.current_position += self.window_overlap
         return window
-

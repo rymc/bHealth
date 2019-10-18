@@ -9,6 +9,8 @@ import pandas as pd
 import datetime
 import csv
 
+import os
+
 from scipy import stats
 from datetime import datetime
 from glob import glob
@@ -36,9 +38,10 @@ def data_loader_accelerometer():
 
         data = pd.read_csv(meta_data, header=None)
 
-        experiment_folders = glob(fold_house + 'experiments/living*/')
+        experiment_folders = glob(os.path.join(fold_house, 'experiments/living*/'))
 
         print('Found', len(experiment_folders), 'experiment folders.')
+        
 
         for idx, fold in enumerate(experiment_folders):
 

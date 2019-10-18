@@ -45,14 +45,14 @@ from sklearn.metrics import brier_score_loss
 from sklearn.feature_selection import SelectFromModel
 
 sys.path.append('../')
-from digihealth.visualisations import plot_metrics
-from digihealth.visualisations import features_figure
-from digihealth.visualisations import plot_features
-from digihealth.visualisations import plot_test_train_splits
-from digihealth import data_loading
-from digihealth.transforms import Transforms
-from digihealth.metrics import Metrics
-from digihealth.metric_wrappers import Wrapper
+from bhealth.visualisations import plot_metrics
+from bhealth.visualisations import features_figure
+from bhealth.visualisations import plot_features
+from bhealth.visualisations import plot_test_train_splits
+from bhealth import data_loading
+from bhealth.transforms import Transforms
+from bhealth.metrics import Metrics
+from bhealth.metric_wrappers import Wrapper
 
 import scipy.stats
 from scipy.signal import butter, filtfilt
