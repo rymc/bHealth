@@ -13,29 +13,27 @@ from scipy import stats
 from datetime import datetime
 from glob import glob
 
+import os
+
 def data_loader_accelerometer_debug():
     """
     Load example accelerometer data.
     """
 
-    data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
-
+    #data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
+    data_directory = os.path.join('..', 'data', 'acc_loc_data', 'ble-accelerometer-indoor-localisation-measurements', 'house*{}'.format(os.path.sep))
     ts = np.array([[]]).reshape(0, 1)
     ts_n = np.array([[]]).reshape(0, 1)
     xyz = np.array([[]]).reshape(0, 3)
     labels = np.array([[]]).reshape(0, 1)
 
-    folders = glob(data_directory)
-
-    print('Found', len(folders), 'house folders.')
+    folders = sorted(glob(data_directory))
 
     for idx_house, fold_house in enumerate(folders):
 
-        if idx_house == 1:
+        if idx_house == 0:
 
-            experiment_folders = glob(fold_house + 'experiments/living*/')
-
-            print('Found', len(experiment_folders), 'experiment folders.')
+            experiment_folders = sorted(glob(os.path.join(fold_house, 'experiments', 'living*{}'.format(os.path.sep))))
 
             for idx, fold in enumerate(experiment_folders):
 
