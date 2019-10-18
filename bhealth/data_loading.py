@@ -15,12 +15,14 @@ from scipy import stats
 from datetime import datetime
 from glob import glob
 
-def data_loader_accelerometer():
+def data_loader_accelerometer(house_id=None):
     """
     Load example accelerometer data.
+
+    house_id: list of strings (eg. ['A', 'B']
     """
 
-    data_directory = '../data/acc_loc_data/ble-accelerometer-indoor-localisation-measurements/house*/'
+    data_directory = os.path.join('..', 'data', 'acc_loc_data', 'ble-accelerometer-indoor-localisation-measurements', 'house*{}'.format(os.path.sep))
 
     ts = np.array([[]]).reshape(0, 1)
     ts_n = np.array([[]]).reshape(0, 1)
@@ -32,6 +34,11 @@ def data_loader_accelerometer():
     print('Found', len(folders), 'house folders.')
 
     for idx_house, fold_house in enumerate(folders):
+
+        this_house_id = fold_house[-2]
+
+        if (house_id is not None) and (this_house_id not in house_id):
+            continue
 
         meta_data = [fold_house + 'metadata/act_desc.dat']
         meta_data = ''.join(meta_data)

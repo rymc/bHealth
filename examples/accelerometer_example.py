@@ -10,7 +10,6 @@ from bhealth.visualisations import features_figure
 from bhealth.visualisations import plot_features
 from bhealth.visualisations import plot_test_train_splits
 from bhealth import data_loading
-from bhealth import data_loading_debug
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -22,14 +21,14 @@ from bhealth.metric_wrappers import Wrapper
 
 def get_raw_ts_X_y():
 
-    labels, ts, xyz = data_loading_debug.data_loader_accelerometer_debug()
+    labels, ts, xyz = data_loading.data_loader_accelerometer(house_id='A')
     return ts, xyz, labels
 
 def preprocess_X_y(ts, X, y):
     new_X = []
     new_y = []
 
-    winlength_seconds = 10
+    winlength_seconds = 5
     overlap_seconds = 1
     print("Window size of "+str(winlength_seconds)+" seconds and overlap of "+str(float(overlap_seconds) / winlength_seconds)+"%")
     samples_per_sec = 50
