@@ -72,6 +72,71 @@ class Transforms:
         """
         return np.mean(x)
 
+
+    @staticmethod
+    def minx(x):
+        """
+        Return the mean.
+
+        Parameters
+        ----------
+        x
+            A window of data.
+
+        Returns
+        -------
+        min
+        """
+        return np.min(x)
+
+    @staticmethod
+    def maxx(x):
+        """
+        Return the mean.
+
+        Parameters
+        ----------
+        x
+            A window of data.
+
+        Returns
+        -------
+        max
+        """
+        return np.max(x)
+
+    @staticmethod
+    def sumx(x):
+        """
+        Return the mean.
+
+        Parameters
+        ----------
+        x
+            A window of data.
+
+        Returns
+        -------
+        sum
+        """
+        return np.sum(x)
+    
+    @staticmethod
+    def prod(x):
+        """
+        Return the mean.
+
+        Parameters
+        ----------
+        x
+            A window of data.
+
+        Returns
+        -------
+        prod
+        """
+        return np.prod(x)
+    
     @staticmethod
     def mean_crossings(x):
         """
@@ -102,10 +167,25 @@ class Transforms:
 
         Returns
         -------
-        Transforms.zero_crossings(x)
-            Mean-crossing rate.
+        x.
         """
         return x
+
+    @staticmethod
+    def std(x):
+        """
+        Return the mean.
+
+        Parameters
+        ----------
+        x
+            A window of data.
+
+        Returns
+        -------
+        standard
+        """
+        return np.std(x)
 
     @staticmethod
     def interq(x):
