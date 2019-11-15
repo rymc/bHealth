@@ -31,6 +31,9 @@ def data_loader_accelerometer(house_id=None):
 
     folders = glob(data_directory)
 
+    if len(folders) == 0:
+        raise Exception("Couldn't find any house folders. Please run 'download-rssi-acc.sh' first.")
+    
     print('Found', len(folders), 'house folders.')
 
     for idx_house, fold_house in enumerate(folders):
