@@ -20,12 +20,25 @@ class Transforms:
     If you want to add your own extraction function, do it here.
     """
 
-    def __init__(self, window_length, window_overlap):
+    def __init__(self, window_length, stride=1, window_overlap=None):
+        """
+        Parameters
+        ----------
+        window_length: integer
+            Number of elements to consider when applying the transformation.
+        stride: integer
+            Number of elements to jump between windows. If stride is 0... TODO
+        window_overlap: integer
+            Deprecated: it was originally the stride, but ocasionally was used
+            to indicate how many elements to overlap between windows. This
+            parameter is going to be removed. Please use the stride.
+        """
         self.window_length = window_length
         self.current_position = 0
-        self.window_overlap = window_overlap
-        # TODO Check that this step does not cause any other problems
-        self.step = window_length - window_overlap
+        if window_overlap is not None:
+            print('Warning, window_overlap is going to be deprecated, use stride')
+            stride = window_overlap
+        self.stride = stride
 
     @staticmethod
     def zero_crossings(x):
@@ -406,8 +419,7 @@ class Transforms:
             else:
                 window = window[~np.isnan(window)]
         if update:
-            # TODO Check that this does not break anything
-            self.current_position += self.step
+            self.current_position += self.stride
         return window
 
     def feature_selection(self, X, y, method):
