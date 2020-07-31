@@ -49,18 +49,20 @@ def preprocess_X_y(ts, X, y):
                           transform.kurtosis]
 
     while True:
-        windowed_raw = transform.slide(X)
+        try:
+            ts_window = ts[transform.current_position-1]
+        except Exception as e:
+            print(e)
+            break
+        windowed_raw = transform.slide(X, update=False)
+        windowed_raw_labels = transform.slide(y, update=True)
         if len(windowed_raw) > 0:
-            try:
-                windowed_features = [ts[transform.current_position][0]]
-            except Exception as e:
-                print(e)
-                break
+            windowed_features = [ts_window]
             for function in feature_transforms:
-                windowed_features.extend((np.apply_along_axis(function, 0, windowed_raw).tolist()))
+                windowed_features.extend(
+                    (np.apply_along_axis(function, 0, windowed_raw).tolist()))
             new_X.append(windowed_features)
 
-            windowed_raw_labels = transform.slide(y, update=False)
             most_freq_label = np.bincount(windowed_raw_labels).argmax()
             new_y.append(most_freq_label)
 
